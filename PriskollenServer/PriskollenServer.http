@@ -1,0 +1,6 @@
+@PriskollenServer_HostAddress = http://localhost:5269
+
+GET {{PriskollenServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
