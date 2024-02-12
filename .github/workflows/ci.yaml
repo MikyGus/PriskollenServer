@@ -1,0 +1,30 @@
+name: Code Tests
+
+on: 
+    push:
+
+
+concurrency:
+    group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+    cancel-in-progress: true
+
+
+jobs:
+    testcode:
+        name: Code Tests
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Install dependencies
+              run: dotnet restore
+
+            - name: Build
+              run: dotnet build --configuration Release --no-restore
+
+            - name: Run Tests
+              run: dotnet test --no-restore --verbosity normal
+  
+            - name: Format
+              run: dotnet format --verify-no-changes --verbosity diagnostic
