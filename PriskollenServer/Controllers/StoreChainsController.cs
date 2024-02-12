@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.Models;
+using PriskollenServer.Library.Services.StoreChains;
 
 namespace PriskollenServer.Controllers;
 
@@ -8,11 +9,21 @@ namespace PriskollenServer.Controllers;
 [Route("[controller]")]
 public class StoreChainsController : ControllerBase
 {
-    [HttpPost()]
+    private readonly IStoreChainService _storeChainService;
+
+    public StoreChainsController(IStoreChainService storeChainService)
+    {
+        _storeChainService = storeChainService;
+    }
+
+    [HttpPost]
     public IActionResult CreateStoreChain(StoreChainRequest newStoreChain)
     {
         var storeChain = new StoreChain() { Id = Guid.NewGuid(), Name = newStoreChain.Name, Image = newStoreChain.Image };
+
         // TODO: Save the new StoreChain to the database
+        _storeChainService.CreateStoreChain(storeChain);
+
         var response = new StoreChainResponse(storeChain.Id, storeChain.Name, storeChain.Image);
         return CreatedAtAction(
             actionName: nameof(GetStoreChain),
@@ -23,7 +34,9 @@ public class StoreChainsController : ControllerBase
     [HttpGet("{id:guid}")]
     public IActionResult GetStoreChain(Guid id)
     {
-        return Ok(id);
+        StoreChain storeChain = _storeChainService.GetStoreChain(id);
+        StoreChainResponse response = new(storeChain.Id, storeChain.Name, storeChain.Image);
+        return Ok(response);
     }
 
     [HttpGet()]
