@@ -1,0 +1,7 @@
+POST https://localhost:7070/storechains
+Content-Type: application/json
+
+{
+    "Name": "Miky",
+    "Image": "miky.png"
+}
