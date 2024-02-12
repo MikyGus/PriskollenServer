@@ -4,27 +4,28 @@ using PriskollenServer.Library.Contracts;
 namespace PriskollenServer.Controllers;
 
 [ApiController]
+[Route("[controller]")]
 public class StoreChainsController : ControllerBase
 {
-    [HttpPost("/storechains")]
+    [HttpPost()]
     public IActionResult CreateStoreChain(StoreChainRequest newStoreChain)
     {
         return Ok(newStoreChain);
     }
 
-    [HttpGet("/storechains/{id:guid}")]
+    [HttpGet("{id:guid}")]
     public IActionResult GetStoreChain(Guid id)
     {
         return Ok(id);
     }
 
-    [HttpGet("/storechains/")]
+    [HttpGet()]
     public IActionResult GetStoreChain()
     {
         return Ok();
     }
 
-    [HttpPut("/storechains/{id:guid}")]
+    [HttpPut("{id:guid}")]
     public IActionResult UpdateStoreChain(Guid id, StoreChainRequest updatedStoreChain)
     {
         return Ok(id);
