@@ -5,4 +5,6 @@ public interface IStoreChainService
 {
     void CreateStoreChain(StoreChain storeChain);
     StoreChain GetStoreChain(Guid id);
+    IEnumerable<StoreChain> GetStoreChains();
+    void UpdateStoreChain(StoreChain storeChain);
 }

@@ -48,12 +48,22 @@ public class StoreChainsController : ControllerBase
     [HttpGet()]
     public IActionResult GetStoreChain()
     {
-        return Ok();
+        IEnumerable<StoreChain> storeChains = _storeChainService.GetStoreChains();
+        return Ok(storeChains);
     }
 
     [HttpPut("{id:guid}")]
     public IActionResult UpdateStoreChain(Guid id, StoreChainRequest updatedStoreChain)
     {
-        return Ok(id);
+        StoreChain storeChain = new()
+        {
+            Id = id,
+            Name = updatedStoreChain.Name,
+            Image = updatedStoreChain.Image,
+            Modified = DateTime.UtcNow,
+        };
+        _storeChainService.UpdateStoreChain(storeChain);
+
+        return NoContent();
     }
 }
