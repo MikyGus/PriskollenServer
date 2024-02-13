@@ -19,12 +19,18 @@ public class StoreChainsController : ControllerBase
     [HttpPost]
     public IActionResult CreateStoreChain(StoreChainRequest newStoreChain)
     {
-        var storeChain = new StoreChain() { Id = Guid.NewGuid(), Name = newStoreChain.Name, Image = newStoreChain.Image };
+        var storeChain = new StoreChain()
+        {
+            Id = Guid.NewGuid(),
+            Name = newStoreChain.Name,
+            Image = newStoreChain.Image,
+            Created = DateTime.UtcNow,
+            Modified = DateTime.UtcNow,
+        };
 
-        // TODO: Save the new StoreChain to the database
         _storeChainService.CreateStoreChain(storeChain);
 
-        var response = new StoreChainResponse(storeChain.Id, storeChain.Name, storeChain.Image);
+        var response = new StoreChainResponse(storeChain.Id, storeChain.Name, storeChain.Image, storeChain.Created, storeChain.Modified);
         return CreatedAtAction(
             actionName: nameof(GetStoreChain),
             routeValues: new { id = storeChain.Id },
@@ -35,7 +41,7 @@ public class StoreChainsController : ControllerBase
     public IActionResult GetStoreChain(Guid id)
     {
         StoreChain storeChain = _storeChainService.GetStoreChain(id);
-        StoreChainResponse response = new(storeChain.Id, storeChain.Name, storeChain.Image);
+        StoreChainResponse response = new(storeChain.Id, storeChain.Name, storeChain.Image, storeChain.Created, storeChain.Modified);
         return Ok(response);
     }
 

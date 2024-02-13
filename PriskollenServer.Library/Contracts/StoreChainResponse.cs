@@ -2,4 +2,6 @@
 public record StoreChainResponse(
     Guid Id,
     string Name,
-    string Image);
+    string Image,
+    DateTime Created,
+    DateTime Modified);
