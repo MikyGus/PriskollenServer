@@ -1,3 +1,4 @@
+using PriskollenServer.Library.Services.StoreChains;
 using Serilog;
 
 // Serilog config
@@ -21,6 +22,8 @@ try
     builder.Host.UseSerilog();
 
     builder.Services.AddControllers();
+    builder.Services.AddScoped<IStoreChainService, StoreChainService>();
+
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();

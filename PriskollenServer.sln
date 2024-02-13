@@ -5,6 +5,8 @@ VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PriskollenServer", "PriskollenServer\PriskollenServer.csproj", "{E65280A2-7430-4920-A45C-29FA572A3DB3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PriskollenServer.Library", "PriskollenServer.Library\PriskollenServer.Library.csproj", "{FC6E8BAC-76B4-43DB-AD74-DC129A6D1C73}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{E65280A2-7430-4920-A45C-29FA572A3DB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E65280A2-7430-4920-A45C-29FA572A3DB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E65280A2-7430-4920-A45C-29FA572A3DB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC6E8BAC-76B4-43DB-AD74-DC129A6D1C73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC6E8BAC-76B4-43DB-AD74-DC129A6D1C73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC6E8BAC-76B4-43DB-AD74-DC129A6D1C73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC6E8BAC-76B4-43DB-AD74-DC129A6D1C73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
