@@ -1,4 +1,6 @@
-﻿using PriskollenServer.Library.Models;
+﻿using ErrorOr;
+using PriskollenServer.Library.Models;
+using PriskollenServer.Library.ServiceErrors;
 
 namespace PriskollenServer.Library.Services.StoreChains;
 public class StoreChainService : IStoreChainService
@@ -7,7 +9,15 @@ public class StoreChainService : IStoreChainService
 
     public void CreateStoreChain(StoreChain storeChain) => _storeChains.Add(storeChain.Id, storeChain);
 
-    public StoreChain GetStoreChain(Guid id) => _storeChains[id];
+    public ErrorOr<StoreChain> GetStoreChain(Guid id)
+    {
+        if (_storeChains.TryGetValue(id, out StoreChain storeChain))
+        {
+            return storeChain;
+        }
+        return Errors.StoreChain.NotFound;
+    }
+
     public IEnumerable<StoreChain> GetStoreChains() => _storeChains.Values;
     public void UpdateStoreChain(StoreChain storeChain)
     {

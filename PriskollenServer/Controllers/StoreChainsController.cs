@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ErrorOr;
+using Microsoft.AspNetCore.Mvc;
 using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.Models;
+using PriskollenServer.Library.ServiceErrors;
 using PriskollenServer.Library.Services.StoreChains;
 
 namespace PriskollenServer.Controllers;
@@ -40,7 +42,12 @@ public class StoreChainsController : ControllerBase
     [HttpGet("{id:guid}")]
     public IActionResult GetStoreChain(Guid id)
     {
-        StoreChain storeChain = _storeChainService.GetStoreChain(id);
+        ErrorOr<StoreChain> getStoreChainResult = _storeChainService.GetStoreChain(id);
+        if (getStoreChainResult.IsError && getStoreChainResult.FirstError == Errors.StoreChain.NotFound)
+        {
+            return NotFound();
+        }
+        StoreChain storeChain = getStoreChainResult.Value;
         StoreChainResponse response = new(storeChain.Id, storeChain.Name, storeChain.Image, storeChain.Created, storeChain.Modified);
         return Ok(response);
     }

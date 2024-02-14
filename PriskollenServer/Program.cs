@@ -29,24 +29,21 @@ try
     builder.Services.AddSwaggerGen();
 
     WebApplication app = builder.Build();
-
-    app.UseSerilogRequestLogging();
-
-    // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
     {
-        app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseExceptionHandler("/error");
+        app.UseSerilogRequestLogging();
+
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+        app.UseHttpsRedirection();
+        app.UseAuthorization();
+        app.MapControllers();
+        app.Run();
     }
-
-    app.UseHttpsRedirection();
-
-    app.UseAuthorization();
-
-    app.MapControllers();
-
-    app.Run();
-
     Log.Information("Application stopped successfully");
 }
 catch (Exception ex)
