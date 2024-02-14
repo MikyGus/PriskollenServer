@@ -8,6 +8,6 @@ public static class Errors
     {
         public static Error NotFound => Error.NotFound(
             "StoreChain.NotFound",
-            "Store chain not found");
+            "Store-chain not found");
     }
 }

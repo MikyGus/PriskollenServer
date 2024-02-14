@@ -2,14 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.Models;
-using PriskollenServer.Library.ServiceErrors;
 using PriskollenServer.Library.Services.StoreChains;
 
 namespace PriskollenServer.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class StoreChainsController : ControllerBase
+public class StoreChainsController : ApiController
 {
     private readonly IStoreChainService _storeChainService;
 
@@ -43,13 +40,9 @@ public class StoreChainsController : ControllerBase
     public IActionResult GetStoreChain(Guid id)
     {
         ErrorOr<StoreChain> getStoreChainResult = _storeChainService.GetStoreChain(id);
-        if (getStoreChainResult.IsError && getStoreChainResult.FirstError == Errors.StoreChain.NotFound)
-        {
-            return NotFound();
-        }
-        StoreChain storeChain = getStoreChainResult.Value;
-        StoreChainResponse response = new(storeChain.Id, storeChain.Name, storeChain.Image, storeChain.Created, storeChain.Modified);
-        return Ok(response);
+        return getStoreChainResult.Match(
+            storeChain => Ok(MapStoreChainResponse(storeChain)),
+            errors => Problem(errors));
     }
 
     [HttpGet()]
@@ -73,4 +66,11 @@ public class StoreChainsController : ControllerBase
 
         return NoContent();
     }
+
+    private static StoreChainResponse MapStoreChainResponse(StoreChain storeChain)
+        => new(storeChain.Id,
+               storeChain.Name,
+               storeChain.Image,
+               storeChain.Created,
+               storeChain.Modified);
 }
