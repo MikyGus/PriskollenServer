@@ -7,7 +7,11 @@ public class StoreChainService : IStoreChainService
 {
     private static readonly Dictionary<Guid, StoreChain> _storeChains = [];
 
-    public void CreateStoreChain(StoreChain storeChain) => _storeChains.Add(storeChain.Id, storeChain);
+    public ErrorOr<Created> CreateStoreChain(StoreChain storeChain)
+    {
+        _storeChains.Add(storeChain.Id, storeChain);
+        return Result.Created;
+    }
 
     public ErrorOr<StoreChain> GetStoreChain(Guid id)
     {
@@ -18,10 +22,11 @@ public class StoreChainService : IStoreChainService
         return Errors.StoreChain.NotFound;
     }
 
-    public IEnumerable<StoreChain> GetStoreChains() => _storeChains.Values;
-    public void UpdateStoreChain(StoreChain storeChain)
+    public ErrorOr<IEnumerable<StoreChain>> GetStoreChains() => _storeChains.Values;
+    public ErrorOr<Updated> UpdateStoreChain(StoreChain storeChain)
     {
         storeChain.Created = _storeChains[storeChain.Id].Created;
         _storeChains[storeChain.Id] = storeChain;
+        return Result.Updated;
     }
 }
