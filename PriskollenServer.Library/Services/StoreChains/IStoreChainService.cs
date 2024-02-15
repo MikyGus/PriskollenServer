@@ -1,10 +1,11 @@
-﻿using PriskollenServer.Library.Models;
+﻿using ErrorOr;
+using PriskollenServer.Library.Models;
 
 namespace PriskollenServer.Library.Services.StoreChains;
 public interface IStoreChainService
 {
-    void CreateStoreChain(StoreChain storeChain);
-    StoreChain GetStoreChain(Guid id);
-    IEnumerable<StoreChain> GetStoreChains();
-    void UpdateStoreChain(StoreChain storeChain);
+    ErrorOr<Created> CreateStoreChain(StoreChain storeChain);
+    ErrorOr<StoreChain> GetStoreChain(Guid id);
+    ErrorOr<IEnumerable<StoreChain>> GetStoreChains();
+    ErrorOr<Updated> UpdateStoreChain(StoreChain storeChain);
 }

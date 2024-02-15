@@ -16,37 +16,22 @@ try
 {
     Log.Information("Application starting up");
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
-    // Add services to the container.
-    // Use serilog as the logger of choice
-    builder.Host.UseSerilog();
+    {
+        // Use serilog as the logger of choice
+        builder.Host.UseSerilog();
+    }
 
     builder.Services.AddControllers();
     builder.Services.AddScoped<IStoreChainService, StoreChainService>();
 
-    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
-
     WebApplication app = builder.Build();
-
-    app.UseSerilogRequestLogging();
-
-    // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
     {
-        app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseExceptionHandler("/error");
+        app.UseSerilogRequestLogging();
+        app.UseHttpsRedirection();
+        app.MapControllers();
+        app.Run();
     }
-
-    app.UseHttpsRedirection();
-
-    app.UseAuthorization();
-
-    app.MapControllers();
-
-    app.Run();
-
     Log.Information("Application stopped successfully");
 }
 catch (Exception ex)

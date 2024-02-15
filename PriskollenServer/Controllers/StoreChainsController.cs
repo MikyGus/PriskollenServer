@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ErrorOr;
+using Microsoft.AspNetCore.Mvc;
 using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.Models;
 using PriskollenServer.Library.Services.StoreChains;
 
 namespace PriskollenServer.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class StoreChainsController : ControllerBase
+public class StoreChainsController : ApiController
 {
     private readonly IStoreChainService _storeChainService;
 
@@ -19,51 +18,74 @@ public class StoreChainsController : ControllerBase
     [HttpPost]
     public IActionResult CreateStoreChain(StoreChainRequest newStoreChain)
     {
-        var storeChain = new StoreChain()
+        ErrorOr<StoreChain> requestToStoreChainResult = StoreChain.CreateFrom(newStoreChain);
+        if (requestToStoreChainResult.IsError)
         {
-            Id = Guid.NewGuid(),
-            Name = newStoreChain.Name,
-            Image = newStoreChain.Image,
-            Created = DateTime.UtcNow,
-            Modified = DateTime.UtcNow,
-        };
+            return Problem(requestToStoreChainResult.Errors);
+        }
 
-        _storeChainService.CreateStoreChain(storeChain);
+        StoreChain storeChain = requestToStoreChainResult.Value;
 
-        var response = new StoreChainResponse(storeChain.Id, storeChain.Name, storeChain.Image, storeChain.Created, storeChain.Modified);
-        return CreatedAtAction(
-            actionName: nameof(GetStoreChain),
-            routeValues: new { id = storeChain.Id },
-            value: response);
+        ErrorOr<Created> createStoreChainResult = _storeChainService.CreateStoreChain(storeChain);
+
+        return createStoreChainResult.Match(
+            created => CreatedAtGetStoreChain(storeChain),
+            errors => Problem(errors));
     }
 
     [HttpGet("{id:guid}")]
     public IActionResult GetStoreChain(Guid id)
     {
-        StoreChain storeChain = _storeChainService.GetStoreChain(id);
-        StoreChainResponse response = new(storeChain.Id, storeChain.Name, storeChain.Image, storeChain.Created, storeChain.Modified);
-        return Ok(response);
+        ErrorOr<StoreChain> getStoreChainResult = _storeChainService.GetStoreChain(id);
+        return getStoreChainResult.Match(
+            storeChain => Ok(MapStoreChainResponse(storeChain)),
+            errors => Problem(errors));
     }
 
     [HttpGet()]
     public IActionResult GetStoreChain()
     {
-        IEnumerable<StoreChain> storeChains = _storeChainService.GetStoreChains();
-        return Ok(storeChains);
+        ErrorOr<IEnumerable<StoreChain>> getStoreChainsResult = _storeChainService.GetStoreChains();
+        return getStoreChainsResult.Match(
+            storeChains => Ok(MapStoreChainResponse(storeChains)),
+            errors => Problem(errors));
     }
 
     [HttpPut("{id:guid}")]
     public IActionResult UpdateStoreChain(Guid id, StoreChainRequest updatedStoreChain)
     {
-        StoreChain storeChain = new()
+        ErrorOr<StoreChain> RequestToStoreChainRequest = StoreChain.CreateFrom(id, updatedStoreChain);
+        if (RequestToStoreChainRequest.IsError)
         {
-            Id = id,
-            Name = updatedStoreChain.Name,
-            Image = updatedStoreChain.Image,
-            Modified = DateTime.UtcNow,
-        };
-        _storeChainService.UpdateStoreChain(storeChain);
+            return Problem(RequestToStoreChainRequest.Errors);
+        }
+        StoreChain storeChain = RequestToStoreChainRequest.Value;
 
-        return NoContent();
+        ErrorOr<Updated> UpdateStoreChainResult = _storeChainService.UpdateStoreChain(storeChain);
+
+        return UpdateStoreChainResult.Match(
+            updated => NoContent(),
+            errors => Problem(errors));
     }
+
+    private static StoreChainResponse MapStoreChainResponse(StoreChain storeChain)
+        => new(storeChain.Id,
+               storeChain.Name,
+               storeChain.Image,
+               storeChain.Created,
+               storeChain.Modified);
+
+    private static IEnumerable<StoreChainResponse> MapStoreChainResponse(IEnumerable<StoreChain> storeChains)
+    {
+        foreach (StoreChain storeChain in storeChains)
+        {
+            yield return MapStoreChainResponse(storeChain);
+        }
+    }
+
+    private CreatedAtActionResult CreatedAtGetStoreChain(StoreChain storeChain)
+        => CreatedAtAction(
+            actionName: nameof(GetStoreChain),
+            routeValues: new { id = storeChain.Id },
+            value: MapStoreChainResponse(storeChain));
 }
