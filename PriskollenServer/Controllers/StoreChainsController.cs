@@ -18,7 +18,7 @@ public class StoreChainsController : ApiController
     [HttpPost]
     public IActionResult CreateStoreChain(StoreChainRequest newStoreChain)
     {
-        ErrorOr<StoreChain> requestToStoreChainResult = StoreChain.Create(newStoreChain.Name, newStoreChain.Image);
+        ErrorOr<StoreChain> requestToStoreChainResult = StoreChain.CreateFrom(newStoreChain);
         if (requestToStoreChainResult.IsError)
         {
             return Problem(requestToStoreChainResult.Errors);
@@ -54,7 +54,7 @@ public class StoreChainsController : ApiController
     [HttpPut("{id:guid}")]
     public IActionResult UpdateStoreChain(Guid id, StoreChainRequest updatedStoreChain)
     {
-        ErrorOr<StoreChain> RequestToStoreChainRequest = StoreChain.Create(updatedStoreChain.Name, updatedStoreChain.Image, id);
+        ErrorOr<StoreChain> RequestToStoreChainRequest = StoreChain.CreateFrom(id, updatedStoreChain);
         if (RequestToStoreChainRequest.IsError)
         {
             return Problem(RequestToStoreChainRequest.Errors);

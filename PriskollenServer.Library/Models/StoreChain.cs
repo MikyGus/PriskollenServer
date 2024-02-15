@@ -1,4 +1,5 @@
 ﻿using ErrorOr;
+using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.ServiceErrors;
 
 namespace PriskollenServer.Library.Models;
@@ -23,17 +24,26 @@ public class StoreChain
     }
 
     public static ErrorOr<StoreChain> Create(string name, string image, Guid? id = null, DateTime? created = null)
+        => Isvalid(new StoreChainRequest(name, image), out List<Error> errors)
+            ? new StoreChain(id ?? Guid.NewGuid(), name, image, created ?? DateTime.UtcNow, DateTime.UtcNow)
+            : errors;
+
+    public static ErrorOr<StoreChain> CreateFrom(StoreChainRequest request)
+        => Isvalid(request, out List<Error> errors)
+            ? new StoreChain(Guid.NewGuid(), request.Name, request.Image, DateTime.UtcNow, DateTime.UtcNow)
+            : errors;
+    public static ErrorOr<StoreChain> CreateFrom(Guid id, StoreChainRequest request)
+        => Isvalid(request, out List<Error> errors)
+            ? new StoreChain(id, request.Name, request.Image, DateTime.UtcNow, DateTime.UtcNow)
+            : errors;
+
+    private static bool Isvalid(StoreChainRequest request, out List<Error> errors)
     {
-        List<Error> errors = [];
-        if (name.Length is < MinNameLength or > MaxNameLength)
+        errors = [];
+        if (request.Name.Length is < MinNameLength or > MaxNameLength)
         {
             errors.Add(Errors.StoreChain.InvalidName);
         }
-        if (errors.Count > 0)
-        {
-            return errors;
-        }
-
-        return new StoreChain(id ?? Guid.NewGuid(), name, image, created ?? DateTime.UtcNow, DateTime.UtcNow);
+        return errors.Count == 0;
     }
 }
