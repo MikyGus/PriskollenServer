@@ -18,14 +18,13 @@ public class StoreChainsController : ApiController
     [HttpPost]
     public IActionResult CreateStoreChain(StoreChainRequest newStoreChain)
     {
-        var storeChain = new StoreChain()
+        ErrorOr<StoreChain> requestToStoreChainResult = StoreChain.Create(newStoreChain.Name, newStoreChain.Image);
+        if (requestToStoreChainResult.IsError)
         {
-            Id = Guid.NewGuid(),
-            Name = newStoreChain.Name,
-            Image = newStoreChain.Image,
-            Created = DateTime.UtcNow,
-            Modified = DateTime.UtcNow,
-        };
+            return Problem(requestToStoreChainResult.Errors);
+        }
+
+        StoreChain storeChain = requestToStoreChainResult.Value;
 
         ErrorOr<Created> createStoreChainResult = _storeChainService.CreateStoreChain(storeChain);
 
@@ -55,13 +54,13 @@ public class StoreChainsController : ApiController
     [HttpPut("{id:guid}")]
     public IActionResult UpdateStoreChain(Guid id, StoreChainRequest updatedStoreChain)
     {
-        StoreChain storeChain = new()
+        ErrorOr<StoreChain> RequestToStoreChainRequest = StoreChain.Create(updatedStoreChain.Name, updatedStoreChain.Image, id);
+        if (RequestToStoreChainRequest.IsError)
         {
-            Id = id,
-            Name = updatedStoreChain.Name,
-            Image = updatedStoreChain.Image,
-            Modified = DateTime.UtcNow,
-        };
+            return Problem(RequestToStoreChainRequest.Errors);
+        }
+        StoreChain storeChain = RequestToStoreChainRequest.Value;
+
         ErrorOr<Updated> UpdateStoreChainResult = _storeChainService.UpdateStoreChain(storeChain);
 
         return UpdateStoreChainResult.Match(

@@ -25,8 +25,13 @@ public class StoreChainService : IStoreChainService
     public ErrorOr<IEnumerable<StoreChain>> GetStoreChains() => _storeChains.Values;
     public ErrorOr<Updated> UpdateStoreChain(StoreChain storeChain)
     {
-        storeChain.Created = _storeChains[storeChain.Id].Created;
-        _storeChains[storeChain.Id] = storeChain;
-        return Result.Updated;
+        // INFO: This is a bit hacky, but should get better when we use a real database
+        if (_storeChains.TryGetValue(storeChain.Id, out StoreChain sc))
+        {
+            ErrorOr<StoreChain> storeC = StoreChain.Create(storeChain.Name, storeChain.Image, storeChain.Id, sc.Created);
+            _storeChains[storeChain.Id] = storeC.Value;
+            return Result.Updated;
+        }
+        return Errors.StoreChain.NotFound;
     }
 }
