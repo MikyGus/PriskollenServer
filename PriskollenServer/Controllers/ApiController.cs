@@ -1,5 +1,6 @@
 ﻿using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace PriskollenServer.Controllers;
 
@@ -9,6 +10,21 @@ public class ApiController : ControllerBase
 {
     protected IActionResult Problem(List<Error> errors)
     {
+        if (errors.All(e => e.Type == ErrorType.Validation))
+        {
+            var modelStateDictionary = new ModelStateDictionary();
+            foreach (Error error in errors)
+            {
+                modelStateDictionary.AddModelError(error.Code, error.Description);
+            }
+            return ValidationProblem(modelStateDictionary);
+        }
+
+        if (errors.Any(e => e.Type == ErrorType.Unexpected))
+        {
+            return Problem();
+        }
+
         Error firstError = errors[0];
         int statusCode = firstError.Type switch
         {
