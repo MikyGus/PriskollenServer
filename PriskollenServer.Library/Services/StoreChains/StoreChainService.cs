@@ -15,9 +15,11 @@ public class StoreChainService : IStoreChainService
 
     public ErrorOr<StoreChain> GetStoreChain(Guid id)
     {
-        if (_storeChains.TryGetValue(id, out StoreChain storeChain))
+        if (_storeChains.TryGetValue(id, out StoreChain? storeChain))
         {
-            return storeChain;
+            return storeChain is null
+                ? Errors.StoreChain.NotFound
+                : storeChain;
         }
         return Errors.StoreChain.NotFound;
     }
@@ -26,8 +28,12 @@ public class StoreChainService : IStoreChainService
     public ErrorOr<Updated> UpdateStoreChain(StoreChain storeChain)
     {
         // INFO: This is a bit hacky, but should get better when we use a real database
-        if (_storeChains.TryGetValue(storeChain.Id, out StoreChain sc))
+        if (_storeChains.TryGetValue(storeChain.Id, out StoreChain? sc))
         {
+            if (sc is null)
+            {
+                return Errors.StoreChain.NotFound;
+            }
             ErrorOr<StoreChain> storeC = StoreChain.Create(storeChain.Name, storeChain.Image, storeChain.Id, sc.Created);
             _storeChains[storeChain.Id] = storeC.Value;
             return Result.Updated;
