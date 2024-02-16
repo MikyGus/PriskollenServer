@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  priskollenserver:
+    image: ${DOCKER_REGISTRY-}priskollenserver
+    build:
+      context: .
+      dockerfile: PriskollenServer/Dockerfile
