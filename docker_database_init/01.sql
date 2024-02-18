@@ -12,3 +12,20 @@ INSERT INTO storechains (name, image) VALUES
 ('Ica', null),
 ('City Gross', null),
 ('Coop', null);
+
+
+DELIMITER $$
+$$
+CREATE PROCEDURE GetAllStorechains()
+BEGIN
+	Select id, name, image, created, modified from storechains order by name;
+END$$
+
+CREATE PROCEDURE GetStorechain(in istorechainid int)
+BEGIN
+	Select id, name, image, created, modified 
+	from storechains 
+	where id = istorechainid
+	order by name;
+END$$
+DELIMITER ;
