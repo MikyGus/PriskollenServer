@@ -16,6 +16,19 @@ INSERT INTO storechains (name, image) VALUES
 
 DELIMITER $$
 $$
+CREATE PROCEDURE CreateStorechain(in iName varchar(50),in iImage varchar(50))
+BEGIN
+	INSERT INTO storechains (name, image) 
+	VALUES (iName, iImage);
+END$$
+
+CREATE PROCEDURE UpdateStorechain(in iId int, in iName varchar(50), in iImage varchar(50))
+BEGIN
+	UPDATE storechains
+	SET name = iName, image = iImage, modified = CURRENT_TIMESTAMP()
+	WHERE id = iId;
+END$$
+
 CREATE PROCEDURE GetAllStorechains()
 BEGIN
 	Select id, name, image, created, modified from storechains order by name;
