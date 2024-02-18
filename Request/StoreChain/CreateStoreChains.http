@@ -1,4 +1,4 @@
-POST https://localhost:7070/storechains
+POST https://localhost:5001/storechains
 Content-Type: application/json
 
 {
@@ -8,7 +8,7 @@ Content-Type: application/json
 
 ###
 # Should result in error due to short name:
-POST https://localhost:7070/storechains
+POST https://localhost:5001/storechains
 Content-Type: application/json
 
 {
@@ -17,4 +17,4 @@ Content-Type: application/json
 } 
 
 ###
-GET https://localhost:7070/StoreChains/65a51733-3a56-450d-8025-e0383b28b0ed
+GET https://localhost:5001/StoreChains/65a51733-3a56-450d-8025-e0383b28b0ed
