@@ -21,11 +21,11 @@ BEGIN
 	Select id, name, image, created, modified from storechains order by name;
 END$$
 
-CREATE PROCEDURE GetStorechain(in istorechainid int)
+CREATE PROCEDURE GetStorechain(in iStorechainId int)
 BEGIN
 	Select id, name, image, created, modified 
 	from storechains 
-	where id = istorechainid
+	where id = iStorechainId
 	order by name;
 END$$
 DELIMITER ;
