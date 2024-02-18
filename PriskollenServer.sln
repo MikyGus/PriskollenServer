@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PriskollenServer.Library", 
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{E31050DA-A65C-4E8E-8387-9BE3A5EF60FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PriskollenServer.Tests", "PriskollenServer.Tests\PriskollenServer.Tests.csproj", "{C91012B4-AB25-46BD-B30C-C87BD18A5356}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{E31050DA-A65C-4E8E-8387-9BE3A5EF60FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E31050DA-A65C-4E8E-8387-9BE3A5EF60FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E31050DA-A65C-4E8E-8387-9BE3A5EF60FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C91012B4-AB25-46BD-B30C-C87BD18A5356}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C91012B4-AB25-46BD-B30C-C87BD18A5356}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C91012B4-AB25-46BD-B30C-C87BD18A5356}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C91012B4-AB25-46BD-B30C-C87BD18A5356}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
