@@ -7,6 +7,6 @@ public interface IStoreChainService
 {
     Task<ErrorOr<StoreChain>> CreateStoreChain(StoreChainRequest storeChain);
     Task<ErrorOr<StoreChain>> GetStoreChain(int id);
-    Task<ErrorOr<List<StoreChain>>> GetStoreChains();
+    Task<ErrorOr<List<StoreChain>>> GetAllStoreChains();
     ErrorOr<Updated> UpdateStoreChain(StoreChain storeChain);
 }

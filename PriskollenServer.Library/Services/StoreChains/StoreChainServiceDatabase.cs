@@ -55,11 +55,23 @@ public class StoreChainServiceDatabase : IStoreChainService
             : Errors.StoreChain.NotFound;
     }
 
-    public async Task<ErrorOr<List<StoreChain>>> GetStoreChains()
+    public async Task<ErrorOr<List<StoreChain>>> GetAllStoreChains()
     {
-        string sql = "select * from storechains";
-        List<StoreChain> storechains = await _dataAccess.LoadData<StoreChain, dynamic>(sql, new { }, _connectionString);
-        return storechains;
+        using IDbConnection connection = new MySqlConnection(_connectionString);
+        string storedProcedure = "GetAllStorechains";
+        var values = new { };
+
+        try
+        {
+            IEnumerable<StoreChain> storeChains = await connection.QueryAsync<StoreChain>(storedProcedure, values, commandType: CommandType.StoredProcedure);
+            _logger.LogInformation("Retreived a list of all StoreChains");
+            return storeChains.ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retreive all StoreChains from the database");
+            return Errors.StoreChain.NotFound;
+        }
     }
 
     public ErrorOr<Updated> UpdateStoreChain(StoreChain storeChain) => throw new NotImplementedException();

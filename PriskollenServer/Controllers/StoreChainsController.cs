@@ -44,7 +44,7 @@ public class StoreChainsController : ApiController
     [HttpGet()]
     public async Task<IActionResult> GetAllStoreChains()
     {
-        ErrorOr<List<StoreChain>> getStoreChainsResult = await _storeChainService.GetStoreChains();
+        ErrorOr<List<StoreChain>> getStoreChainsResult = await _storeChainService.GetAllStoreChains();
 
         return getStoreChainsResult.Match(
             storeChains => Ok(MapStoreChainResponse(storeChains)),
