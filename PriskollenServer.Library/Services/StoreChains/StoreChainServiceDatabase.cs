@@ -1,8 +1,12 @@
-﻿using ErrorOr;
+﻿using Dapper;
+using ErrorOr;
 using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
+using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.DatabaseAccess;
 using PriskollenServer.Library.Models;
 using PriskollenServer.Library.ServiceErrors;
+using System.Data;
 
 namespace PriskollenServer.Library.Services.StoreChains;
 public class StoreChainServiceDatabase : IStoreChainService
@@ -18,7 +22,23 @@ public class StoreChainServiceDatabase : IStoreChainService
         _connectionString = _config.GetConnectionString("default") ?? throw new ArgumentNullException();
     }
 
-    public ErrorOr<Created> CreateStoreChain(StoreChain storeChain) => throw new NotImplementedException();
+    public async Task<ErrorOr<StoreChain>> CreateStoreChain(StoreChainRequest storeChain)
+    {
+        using IDbConnection connection = new MySqlConnection(_connectionString);
+        string storedProcedure = "CreateStorechain";
+        var values = new { storeChain.Name, storeChain.Image };
+
+        try
+        {
+            StoreChain result = await connection.QuerySingleAsync<StoreChain>(storedProcedure, values, commandType: CommandType.StoredProcedure);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            return Errors.StoreChain.InsertFailure;
+        }
+    }
+
     public async Task<ErrorOr<StoreChain>> GetStoreChain(int id)
     {
         string sql = "select * from storechains where id=@id";

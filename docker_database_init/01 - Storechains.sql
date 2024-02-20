@@ -16,10 +16,11 @@ INSERT INTO storechains (name, image) VALUES
 
 DELIMITER $$
 $$
-CREATE PROCEDURE CreateStorechain(in iName varchar(50),in iImage varchar(50))
+CREATE PROCEDURE CreateStorechain(in Name varchar(50),in Image varchar(50))
 BEGIN
 	INSERT INTO storechains (name, image) 
-	VALUES (iName, iImage);
+	VALUES (Name, Image)
+	RETURNING id, name, image, created, modified;
 END$$
 
 CREATE PROCEDURE UpdateStorechain(in iId int, in iName varchar(50), in iImage varchar(50))

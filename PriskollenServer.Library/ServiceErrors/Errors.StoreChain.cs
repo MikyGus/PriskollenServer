@@ -7,6 +7,10 @@ public static class Errors
 {
     public static class StoreChain
     {
+        public static Error InsertFailure => Error.Failure(
+            "StoreChain.InsertFailure",
+            "Store-chain could not be created");
+
         public static Error NotFound => Error.NotFound(
             "StoreChain.NotFound",
             "Store-chain not found");

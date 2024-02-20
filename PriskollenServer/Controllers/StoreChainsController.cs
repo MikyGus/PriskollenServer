@@ -3,35 +3,35 @@ using Microsoft.AspNetCore.Mvc;
 using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.Models;
 using PriskollenServer.Library.Services.StoreChains;
+using PriskollenServer.Library.Validators;
 
 namespace PriskollenServer.Controllers;
 
 public class StoreChainsController : ApiController
 {
     private readonly IStoreChainService _storeChainService;
+    private IValidator _validator;
 
-    public StoreChainsController(IStoreChainService storeChainService)
+    public StoreChainsController(IStoreChainService storeChainService, IValidator validator)
     {
         _storeChainService = storeChainService;
+        _validator = validator;
     }
 
-    //[HttpPost]
-    //public IActionResult CreateStoreChain(StoreChainRequest newStoreChain)
-    //{
-    //    ErrorOr<StoreChain> requestToStoreChainResult = StoreChain.CreateFrom(newStoreChain);
-    //    if (requestToStoreChainResult.IsError)
-    //    {
-    //        return Problem(requestToStoreChainResult.Errors);
-    //    }
+    [HttpPost]
+    public async Task<IActionResult> CreateStoreChain(StoreChainRequest newStoreChain)
+    {
+        ErrorOr<StoreChainRequest> storeChainRequestValidated = _validator.Validate(newStoreChain);
+        if (storeChainRequestValidated.IsError)
+        {
+            return Problem(storeChainRequestValidated.Errors);
+        }
+        ErrorOr<StoreChain> createNewStoreChainResult = await _storeChainService.CreateStoreChain(storeChainRequestValidated.Value);
 
-    //    StoreChain storeChain = requestToStoreChainResult.Value;
-
-    //    ErrorOr<Created> createStoreChainResult = _storeChainService.CreateStoreChain(storeChain);
-
-    //    return createStoreChainResult.Match(
-    //        created => CreatedAtGetStoreChain(storeChain),
-    //        errors => Problem(errors));
-    //}
+        return createNewStoreChainResult.Match(
+            storechain => CreatedAtGetStoreChain(storechain),
+            errors => Problem(errors));
+    }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetStoreChain(int id)
@@ -84,9 +84,9 @@ public class StoreChainsController : ApiController
         }
     }
 
-    //    private CreatedAtActionResult CreatedAtGetStoreChain(StoreChain storeChain)
-    //        => CreatedAtAction(
-    //            actionName: nameof(GetStoreChain),
-    //            routeValues: new { id = storeChain.Id },
-    //            value: MapStoreChainResponse(storeChain));
+    private CreatedAtActionResult CreatedAtGetStoreChain(StoreChain storeChain)
+        => CreatedAtAction(
+            actionName: nameof(GetStoreChain),
+            routeValues: new { id = storeChain.Id },
+            value: MapStoreChainResponse(storeChain));
 }

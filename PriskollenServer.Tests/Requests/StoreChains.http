@@ -12,7 +12,7 @@ GET {{fullAddress}}
 Content-Type: application/json
 
 ### GET STORECHAIN
-GET https://localhost:5001/StoreChains/33957705-cf27-42f9-8e2c-e3c73019c049
+GET https://localhost:5001/StoreChains/6
 
 ### CREATE STORECHAINS
 POST {{fullAddress}}
