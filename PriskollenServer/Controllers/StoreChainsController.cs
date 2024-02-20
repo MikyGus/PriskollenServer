@@ -27,7 +27,6 @@ public class StoreChainsController : ApiController
             return Problem(storeChainRequestValidated.Errors);
         }
         ErrorOr<StoreChain> createNewStoreChainResult = await _storeChainService.CreateStoreChain(storeChainRequestValidated.Value);
-
         return createNewStoreChainResult.Match(
             storechain => CreatedAtGetStoreChain(storechain),
             errors => Problem(errors));
