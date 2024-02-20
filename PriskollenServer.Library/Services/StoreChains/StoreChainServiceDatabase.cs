@@ -46,13 +46,21 @@ public class StoreChainServiceDatabase : IStoreChainService
 
     public async Task<ErrorOr<StoreChain>> GetStoreChain(int id)
     {
-        string sql = "select * from storechains where id=@id";
-        var parameters = new { Id = id };
-        List<StoreChain> storechains = await _dataAccess.LoadData<StoreChain, dynamic>(sql, parameters, _connectionString);
+        using IDbConnection connection = new MySqlConnection(_connectionString);
+        string storedProcedure = "GetStoreChain";
+        var parameters = new { SearchForId = id };
 
-        return storechains.Count > 0 && storechains.FirstOrDefault() is StoreChain storeChain
-            ? storeChain
-            : Errors.StoreChain.NotFound;
+        try
+        {
+            StoreChain storeChain = await connection.QuerySingleAsync<StoreChain>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+            _logger.LogInformation("Retreived a single record of StoreChain: {StoreChain}", storeChain);
+            return storeChain;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retreive a record from the database");
+            return Errors.StoreChain.NotFound;
+        }
     }
 
     public async Task<ErrorOr<List<StoreChain>>> GetAllStoreChains()

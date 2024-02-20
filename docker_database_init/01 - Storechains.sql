@@ -28,11 +28,11 @@ BEGIN
 	Select id, name, image, created, modified from storechains order by name;
 END$$
 
-CREATE PROCEDURE GetStoreChain(in iStorechainId int)
+CREATE PROCEDURE GetStoreChain(in SearchForId int)
 BEGIN
 	Select id, name, image, created, modified 
 	from storechains 
-	where id = iStorechainId
+	where id = SearchForId
 	order by name;
 END$$
 
