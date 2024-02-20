@@ -1,4 +1,5 @@
 ﻿using ErrorOr;
+using PriskollenServer.Library.Validators;
 
 namespace PriskollenServer.Library.ServiceErrors;
 
@@ -12,7 +13,7 @@ public static class Errors
 
         public static Error InvalidName => Error.Validation(
             "StoreChain.InvalidName",
-            $"Name of Store-chain is not valid. Must be at least {Models.StoreChain.MinNameLength} in length " +
-                $"and maximum {Models.StoreChain.MaxNameLength} in length.");
+            $"Name of Store-chain is not valid. Must be at least {StoreChainValidator.MinNameLength} in length " +
+                $"and maximum {StoreChainValidator.MaxNameLength} in length.");
     }
 }

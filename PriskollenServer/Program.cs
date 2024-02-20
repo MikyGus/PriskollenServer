@@ -1,3 +1,4 @@
+using PriskollenServer.Library.DatabaseAccess;
 using PriskollenServer.Library.Services.StoreChains;
 using Serilog;
 
@@ -22,7 +23,8 @@ try
     }
 
     builder.Services.AddControllers();
-    builder.Services.AddScoped<IStoreChainService, StoreChainService>();
+    builder.Services.AddSingleton<IDataAccess, DataAccess>();
+    builder.Services.AddScoped<IStoreChainService, StoreChainServiceDatabase>();
 
     WebApplication app = builder.Build();
     {

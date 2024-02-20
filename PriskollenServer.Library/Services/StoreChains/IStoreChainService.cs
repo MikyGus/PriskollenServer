@@ -5,7 +5,7 @@ namespace PriskollenServer.Library.Services.StoreChains;
 public interface IStoreChainService
 {
     ErrorOr<Created> CreateStoreChain(StoreChain storeChain);
-    ErrorOr<StoreChain> GetStoreChain(Guid id);
-    ErrorOr<IEnumerable<StoreChain>> GetStoreChains();
+    Task<ErrorOr<StoreChain>> GetStoreChain(int id);
+    Task<ErrorOr<List<StoreChain>>> GetStoreChains();
     ErrorOr<Updated> UpdateStoreChain(StoreChain storeChain);
 }

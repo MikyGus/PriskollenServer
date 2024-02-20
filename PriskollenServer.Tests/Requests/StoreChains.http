@@ -1,10 +1,9 @@
-@id=f9fcda70-ed22-4a49-9346-fd21e3b551f9
 @hostAddress = https://localhost:5001
 @controller = storechains
 @fullAddress = {{hostAddress}}/{{controller}}
 
 ### GET STORECHAIN BY ID
-GET {{fullAddress}}/{{id}}
+GET {{fullAddress}}/2
 Content-Type: application/json
 
 ### GET ALL STORECHAINS
@@ -35,7 +34,7 @@ Content-Type: application/json
 } 
 
 ### UPDATE STORECHAIN BY ID
-PUT {{fullAddress}}/{{id}}
+PUT {{fullAddress}}/1
 Content-Type: application/json
 
 {
