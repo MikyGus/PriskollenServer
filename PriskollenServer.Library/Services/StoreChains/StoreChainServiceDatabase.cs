@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using ErrorOr;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.DatabaseAccess;
@@ -13,13 +14,15 @@ public class StoreChainServiceDatabase : IStoreChainService
 {
     private readonly IDataAccess _dataAccess;
     private readonly IConfiguration _config;
+    private readonly ILogger<StoreChainServiceDatabase> _logger;
     private readonly string _connectionString;
 
-    public StoreChainServiceDatabase(IDataAccess dataAccess, IConfiguration config)
+    public StoreChainServiceDatabase(IDataAccess dataAccess, IConfiguration config, ILogger<StoreChainServiceDatabase> logger)
     {
         _dataAccess = dataAccess;
         _config = config;
         _connectionString = _config.GetConnectionString("default") ?? throw new ArgumentNullException();
+        _logger = logger;
     }
 
     public async Task<ErrorOr<StoreChain>> CreateStoreChain(StoreChainRequest storeChain)
@@ -31,10 +34,12 @@ public class StoreChainServiceDatabase : IStoreChainService
         try
         {
             StoreChain result = await connection.QuerySingleAsync<StoreChain>(storedProcedure, values, commandType: CommandType.StoredProcedure);
+            _logger.LogInformation("Inserted a new StoreChain with values: {StoreChain}", result);
             return result;
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Failed to insert new StoreChain with values: {StoreChain}", storeChain);
             return Errors.StoreChain.InsertFailure;
         }
     }
