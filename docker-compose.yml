@@ -1,0 +1,21 @@
+version: '3.4'
+
+services:
+  priskollenserver:
+    container_name: priskollen_server
+    image: ${DOCKER_REGISTRY-}priskollenserver
+    build:
+      context: .
+      dockerfile: PriskollenServer/Dockerfile
+    depends_on:
+      - mariadb
+
+  mariadb:
+    container_name: priskollen_db
+    image: mariadb
+    restart: unless-stopped
+
+    volumes:
+      - ./docker_database_init:/docker-entrypoint-initdb.d
+      # - ./setup/mariadb/config/:/etc/mysql/conf.d
+      # - ./setup/mariadb/data:/var/lib/mysql

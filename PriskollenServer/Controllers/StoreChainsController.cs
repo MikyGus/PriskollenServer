@@ -3,67 +3,65 @@ using Microsoft.AspNetCore.Mvc;
 using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.Models;
 using PriskollenServer.Library.Services.StoreChains;
+using PriskollenServer.Library.Validators;
 
 namespace PriskollenServer.Controllers;
 
 public class StoreChainsController : ApiController
 {
     private readonly IStoreChainService _storeChainService;
+    private IValidator _validator;
 
-    public StoreChainsController(IStoreChainService storeChainService)
+    public StoreChainsController(IStoreChainService storeChainService, IValidator validator)
     {
         _storeChainService = storeChainService;
+        _validator = validator;
     }
 
     [HttpPost]
-    public IActionResult CreateStoreChain(StoreChainRequest newStoreChain)
+    public async Task<IActionResult> CreateStoreChain(StoreChainRequest newStoreChain)
     {
-        ErrorOr<StoreChain> requestToStoreChainResult = StoreChain.CreateFrom(newStoreChain);
-        if (requestToStoreChainResult.IsError)
+        ErrorOr<StoreChainRequest> storeChainRequestValidated = _validator.Validate(newStoreChain);
+        if (storeChainRequestValidated.IsError)
         {
-            return Problem(requestToStoreChainResult.Errors);
+            return Problem(storeChainRequestValidated.Errors);
         }
-
-        StoreChain storeChain = requestToStoreChainResult.Value;
-
-        ErrorOr<Created> createStoreChainResult = _storeChainService.CreateStoreChain(storeChain);
-
-        return createStoreChainResult.Match(
-            created => CreatedAtGetStoreChain(storeChain),
+        ErrorOr<StoreChain> createNewStoreChainResult = await _storeChainService.CreateStoreChain(storeChainRequestValidated.Value);
+        return createNewStoreChainResult.Match(
+            storechain => CreatedAtGetStoreChain(storechain),
             errors => Problem(errors));
     }
 
-    [HttpGet("{id:guid}")]
-    public IActionResult GetStoreChain(Guid id)
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetStoreChain(int id)
     {
-        ErrorOr<StoreChain> getStoreChainResult = _storeChainService.GetStoreChain(id);
+        ErrorOr<StoreChain> getStoreChainResult = await _storeChainService.GetStoreChain(id);
         return getStoreChainResult.Match(
             storeChain => Ok(MapStoreChainResponse(storeChain)),
             errors => Problem(errors));
     }
 
     [HttpGet()]
-    public IActionResult GetStoreChain()
+    public async Task<IActionResult> GetAllStoreChains()
     {
-        ErrorOr<IEnumerable<StoreChain>> getStoreChainsResult = _storeChainService.GetStoreChains();
+        ErrorOr<List<StoreChain>> getStoreChainsResult = await _storeChainService.GetAllStoreChains();
+
         return getStoreChainsResult.Match(
             storeChains => Ok(MapStoreChainResponse(storeChains)),
             errors => Problem(errors));
     }
 
-    [HttpPut("{id:guid}")]
-    public IActionResult UpdateStoreChain(Guid id, StoreChainRequest updatedStoreChain)
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateStoreChain(int id, StoreChainRequest updatedStoreChain)
     {
-        ErrorOr<StoreChain> RequestToStoreChainRequest = StoreChain.CreateFrom(id, updatedStoreChain);
-        if (RequestToStoreChainRequest.IsError)
+        ErrorOr<StoreChainRequest> storeChainRequestValidated = _validator.Validate(updatedStoreChain);
+        if (storeChainRequestValidated.IsError)
         {
-            return Problem(RequestToStoreChainRequest.Errors);
+            return Problem(storeChainRequestValidated.Errors);
         }
-        StoreChain storeChain = RequestToStoreChainRequest.Value;
+        ErrorOr<Updated> updateStoreChainResult = await _storeChainService.UpdateStoreChain(id, storeChainRequestValidated.Value);
 
-        ErrorOr<Updated> UpdateStoreChainResult = _storeChainService.UpdateStoreChain(storeChain);
-
-        return UpdateStoreChainResult.Match(
+        return updateStoreChainResult.Match(
             updated => NoContent(),
             errors => Problem(errors));
     }

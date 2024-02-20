@@ -18,13 +18,13 @@ jobs:
               uses: actions/checkout@v4
 
             - name: Install dependencies
-              run: dotnet restore
+              run: dotnet restore PriskollenServer.sln
 
             - name: Build
-              run: dotnet build --configuration Release --no-restore
+              run: dotnet build PriskollenServer.sln --configuration Release --no-restore
 
             - name: Run Tests
-              run: dotnet test --no-restore --verbosity normal
+              run: dotnet test PriskollenServer.sln --no-restore --verbosity normal
   
             - name: Format
-              run: dotnet format --verify-no-changes --verbosity diagnostic
+              run: dotnet format PriskollenServer.sln --verify-no-changes --verbosity diagnostic

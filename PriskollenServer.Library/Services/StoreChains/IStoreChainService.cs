@@ -1,11 +1,12 @@
 ﻿using ErrorOr;
+using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.Models;
 
 namespace PriskollenServer.Library.Services.StoreChains;
 public interface IStoreChainService
 {
-    ErrorOr<Created> CreateStoreChain(StoreChain storeChain);
-    ErrorOr<StoreChain> GetStoreChain(Guid id);
-    ErrorOr<IEnumerable<StoreChain>> GetStoreChains();
-    ErrorOr<Updated> UpdateStoreChain(StoreChain storeChain);
+    Task<ErrorOr<StoreChain>> CreateStoreChain(StoreChainRequest storeChain);
+    Task<ErrorOr<StoreChain>> GetStoreChain(int id);
+    Task<ErrorOr<List<StoreChain>>> GetAllStoreChains();
+    Task<ErrorOr<Updated>> UpdateStoreChain(int id, StoreChainRequest storeChain);
 }

@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PriskollenServer", "PriskollenServer\PriskollenServer.csproj", "{E65280A2-7430-4920-A45C-29FA572A3DB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PriskollenServer", "PriskollenServer\PriskollenServer.csproj", "{E65280A2-7430-4920-A45C-29FA572A3DB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PriskollenServer.Library", "PriskollenServer.Library\PriskollenServer.Library.csproj", "{FC6E8BAC-76B4-43DB-AD74-DC129A6D1C73}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PriskollenServer.Library", "PriskollenServer.Library\PriskollenServer.Library.csproj", "{FC6E8BAC-76B4-43DB-AD74-DC129A6D1C73}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{E31050DA-A65C-4E8E-8387-9BE3A5EF60FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PriskollenServer.Tests", "PriskollenServer.Tests\PriskollenServer.Tests.csproj", "{C91012B4-AB25-46BD-B30C-C87BD18A5356}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{FC6E8BAC-76B4-43DB-AD74-DC129A6D1C73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC6E8BAC-76B4-43DB-AD74-DC129A6D1C73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC6E8BAC-76B4-43DB-AD74-DC129A6D1C73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E31050DA-A65C-4E8E-8387-9BE3A5EF60FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E31050DA-A65C-4E8E-8387-9BE3A5EF60FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E31050DA-A65C-4E8E-8387-9BE3A5EF60FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E31050DA-A65C-4E8E-8387-9BE3A5EF60FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C91012B4-AB25-46BD-B30C-C87BD18A5356}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C91012B4-AB25-46BD-B30C-C87BD18A5356}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C91012B4-AB25-46BD-B30C-C87BD18A5356}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C91012B4-AB25-46BD-B30C-C87BD18A5356}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

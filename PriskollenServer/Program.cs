@@ -1,4 +1,5 @@
 using PriskollenServer.Library.Services.StoreChains;
+using PriskollenServer.Library.Validators;
 using Serilog;
 
 // Serilog config
@@ -19,10 +20,11 @@ try
     {
         // Use serilog as the logger of choice
         builder.Host.UseSerilog();
-    }
 
-    builder.Services.AddControllers();
-    builder.Services.AddScoped<IStoreChainService, StoreChainService>();
+        builder.Services.AddControllers();
+        builder.Services.AddScoped<IStoreChainService, StoreChainServiceDatabase>();
+        builder.Services.AddScoped<IValidator, StoreChainValidator>();
+    }
 
     WebApplication app = builder.Build();
     {

@@ -1,9 +1,0 @@
-@id=01d611a3-6964-482b-8799-70f56b441b3e
-
-GET https://localhost:7070/storechains/{{id}}
-Content-Type: application/json
-
-###
-
-GET https://localhost:7070/storechains/
-Content-Type: application/json
