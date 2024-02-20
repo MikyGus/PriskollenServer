@@ -1,4 +1,3 @@
-using PriskollenServer.Library.DatabaseAccess;
 using PriskollenServer.Library.Services.StoreChains;
 using PriskollenServer.Library.Validators;
 using Serilog;
@@ -23,7 +22,6 @@ try
         builder.Host.UseSerilog();
 
         builder.Services.AddControllers();
-        builder.Services.AddSingleton<IDataAccess, DataAccess>();
         builder.Services.AddScoped<IStoreChainService, StoreChainServiceDatabase>();
         builder.Services.AddScoped<IValidator, StoreChainValidator>();
     }

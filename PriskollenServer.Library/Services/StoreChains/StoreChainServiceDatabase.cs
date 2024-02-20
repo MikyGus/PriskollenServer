@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using PriskollenServer.Library.Contracts;
-using PriskollenServer.Library.DatabaseAccess;
 using PriskollenServer.Library.Models;
 using PriskollenServer.Library.ServiceErrors;
 using System.Data;
@@ -12,14 +11,12 @@ using System.Data;
 namespace PriskollenServer.Library.Services.StoreChains;
 public class StoreChainServiceDatabase : IStoreChainService
 {
-    private readonly IDataAccess _dataAccess;
     private readonly IConfiguration _config;
     private readonly ILogger<StoreChainServiceDatabase> _logger;
     private readonly string _connectionString;
 
-    public StoreChainServiceDatabase(IDataAccess dataAccess, IConfiguration config, ILogger<StoreChainServiceDatabase> logger)
+    public StoreChainServiceDatabase(IConfiguration config, ILogger<StoreChainServiceDatabase> logger)
     {
-        _dataAccess = dataAccess;
         _config = config;
         _connectionString = _config.GetConnectionString("default") ?? throw new ArgumentNullException();
         _logger = logger;
