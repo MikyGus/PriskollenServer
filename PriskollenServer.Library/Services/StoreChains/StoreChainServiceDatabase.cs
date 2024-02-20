@@ -82,5 +82,30 @@ public class StoreChainServiceDatabase : IStoreChainService
         }
     }
 
-    public ErrorOr<Updated> UpdateStoreChain(StoreChain storeChain) => throw new NotImplementedException();
+    public async Task<ErrorOr<Updated>> UpdateStoreChain(int id, StoreChainRequest storeChain)
+    {
+        using IDbConnection connection = new MySqlConnection(_connectionString);
+        string storedProcedure = "UpdateStoreChain";
+        var parameters = new { SearchForId = id, storeChain.Name, storeChain.Image };
+
+        try
+        {
+            int affectedRows = await connection.QuerySingleAsync<int>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+            if (affectedRows == 1)
+            {
+                _logger.LogInformation("Updated StoreChain with Id: {Id} to values: {StoreChain}", id, storeChain);
+            }
+            else
+            {
+                // TODO: Make use of transaction to roll back
+                _logger.LogError("Updated a number of {Count} StoreChain with Id: {Id} to values: {StoreChain}", affectedRows, id, storeChain);
+            }
+            return Result.Updated;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update StoreChain with Id: {Id} to values: {StoreChain}", id, storeChain);
+            return Errors.StoreChain.NotFound;
+        }
+    }
 }

@@ -36,10 +36,11 @@ BEGIN
 	order by name;
 END$$
 
-CREATE PROCEDURE UpdateStoreChain(in iId int, in iName varchar(50), in iImage varchar(50))
+CREATE PROCEDURE UpdateStoreChain(in SearchForId int, in Name varchar(40), in Image varchar(40))
 BEGIN
 	UPDATE storechains
-	SET name = iName, image = iImage, modified = CURRENT_TIMESTAMP()
-	WHERE id = iId;
+	SET name = Name, image = Image, modified = CURRENT_TIMESTAMP()
+	WHERE id = SearchForId;
+	SELECT ROW_COUNT(); 
 END$$
 DELIMITER ;

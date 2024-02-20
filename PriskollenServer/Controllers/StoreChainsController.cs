@@ -51,22 +51,20 @@ public class StoreChainsController : ApiController
             errors => Problem(errors));
     }
 
-    //[HttpPut("{id:guid}")]
-    //public IActionResult UpdateStoreChain(Guid id, StoreChainRequest updatedStoreChain)
-    //{
-    //    ErrorOr<StoreChain> RequestToStoreChainRequest = StoreChain.CreateFrom(id, updatedStoreChain);
-    //    if (RequestToStoreChainRequest.IsError)
-    //    {
-    //        return Problem(RequestToStoreChainRequest.Errors);
-    //    }
-    //    StoreChain storeChain = RequestToStoreChainRequest.Value;
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateStoreChain(int id, StoreChainRequest updatedStoreChain)
+    {
+        ErrorOr<StoreChainRequest> storeChainRequestValidated = _validator.Validate(updatedStoreChain);
+        if (storeChainRequestValidated.IsError)
+        {
+            return Problem(storeChainRequestValidated.Errors);
+        }
+        ErrorOr<Updated> updateStoreChainResult = await _storeChainService.UpdateStoreChain(id, storeChainRequestValidated.Value);
 
-    //    ErrorOr<Updated> UpdateStoreChainResult = _storeChainService.UpdateStoreChain(storeChain);
-
-    //    return UpdateStoreChainResult.Match(
-    //        updated => NoContent(),
-    //        errors => Problem(errors));
-    //}
+        return updateStoreChainResult.Match(
+            updated => NoContent(),
+            errors => Problem(errors));
+    }
 
     private static StoreChainResponse MapStoreChainResponse(StoreChain storeChain)
         => new(storeChain.Id,
