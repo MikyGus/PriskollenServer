@@ -1,7 +1,9 @@
 ﻿namespace PriskollenServer.Library.Contracts;
 public record StoreRequest(
     string Name,
-    string Coordinates,
+    string Image,
+    double Latitude,
+    double Longitude,
     string Address,
     string City,
-    Guid StoreChain);
+    int StoreChain_id);
