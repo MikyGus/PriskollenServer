@@ -3,7 +3,7 @@ using PriskollenServer.Library.Validators;
 
 namespace PriskollenServer.Library.ServiceErrors;
 
-public static class Errors
+public static partial class Errors
 {
     public static class StoreChain
     {

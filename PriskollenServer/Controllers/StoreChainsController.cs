@@ -10,9 +10,11 @@ namespace PriskollenServer.Controllers;
 public class StoreChainsController : ApiController
 {
     private readonly IStoreChainService _storeChainService;
-    private IValidator _validator;
+    private IStoreChainValidator _validator;
 
-    public StoreChainsController(IStoreChainService storeChainService, IValidator validator)
+    public StoreChainsController(
+        IStoreChainService storeChainService,
+        IStoreChainValidator validator)
     {
         _storeChainService = storeChainService;
         _validator = validator;

@@ -23,7 +23,8 @@ try
 
         builder.Services.AddControllers();
         builder.Services.AddScoped<IStoreChainService, StoreChainServiceDatabase>();
-        builder.Services.AddScoped<IValidator, StoreChainValidator>();
+        builder.Services.AddScoped<IStoreChainValidator, StoreChainValidator>();
+        builder.Services.AddScoped<IStoreValidator, StoreValidator>();
     }
 
     WebApplication app = builder.Build();
