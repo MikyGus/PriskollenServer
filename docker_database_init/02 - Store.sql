@@ -8,7 +8,10 @@
 	storechain_id int,
 	created timestamp default current_timestamp,
 	modified timestamp default current_timestamp,
-	primary key(id)
+	primary key(id),
+	constraint fk_storechain
+	foreign key(storechain_id)
+		references storechains(id)
 	);
 
 INSERT INTO stores (name, image, coordinate, address, city, storechain_id) VALUES
