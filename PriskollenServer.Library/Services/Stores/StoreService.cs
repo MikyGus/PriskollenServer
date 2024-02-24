@@ -12,12 +12,14 @@ using System.Data;
 namespace PriskollenServer.Library.Services.Stores;
 public class StoreService : IStoreService
 {
+    private readonly IDataAccess _dataAccess;
     private readonly IConfiguration _config;
     private readonly ILogger<StoreChainService> _logger;
     private readonly string _connectionString;
 
-    public StoreService(IConfiguration config, ILogger<StoreChainService> logger)
+    public StoreService(IDataAccess dataAccess, IConfiguration config, ILogger<StoreChainService> logger)
     {
+        _dataAccess = dataAccess;
         _config = config;
         _connectionString = _config.GetConnectionString("default") ?? throw new ArgumentNullException();
         _logger = logger;
@@ -46,21 +48,10 @@ public class StoreService : IStoreService
     public Task<ErrorOr<List<Store>>> GetAllStoresByDistance(double latitude, double longitude) => throw new NotImplementedException();
     public async Task<ErrorOr<Store>> GetStore(int id)
     {
-        using IDbConnection connection = new MySqlConnection(_connectionString);
         string storedProcedure = "GetStoreById";
         var parameters = new { SearchForId = id };
-
-        try
-        {
-            Store store = await connection.QuerySingleAsync<Store>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
-            _logger.LogInformation("Retreived a single record of Store: {Store}", store);
-            return store;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to retreive a record from the database");
-            return Errors.Store.NotFound;
-        }
+        ErrorOr<Store> result = await _dataAccess.LoadSingleDataAsync<Store>(storedProcedure, parameters, nameof(Store));
+        return result;
     }
 
     public Task<ErrorOr<Updated>> UpdateStore(int id, StoreChain store) => throw new NotImplementedException();
