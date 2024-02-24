@@ -53,21 +53,10 @@ public class StoreChainService : IStoreChainService
 
     public async Task<ErrorOr<List<StoreChain>>> GetAllStoreChains()
     {
-        using IDbConnection connection = new MySqlConnection(_connectionString);
         string storedProcedure = "GetAllStorechains";
-        var values = new { };
-
-        try
-        {
-            IEnumerable<StoreChain> storeChains = await connection.QueryAsync<StoreChain>(storedProcedure, values, commandType: CommandType.StoredProcedure);
-            _logger.LogInformation("Retreived a list of all StoreChains");
-            return storeChains.ToList();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to retreive all StoreChains from the database");
-            return Errors.StoreChain.NotFound;
-        }
+        var parameters = new { };
+        ErrorOr<List<StoreChain>> storeChains = await _dataAccess.LoadMultipleDataAsync<StoreChain>(storedProcedure, parameters, nameof(StoreChains));
+        return storeChains;
     }
 
     public async Task<ErrorOr<Updated>> UpdateStoreChain(int id, StoreChainRequest storeChain)

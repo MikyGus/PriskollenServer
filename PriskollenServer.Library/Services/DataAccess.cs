@@ -39,4 +39,24 @@ public class DataAccess : IDataAccess
             return Errors.Generic.NotFound(errorDisplayName);
         }
     }
+
+    public async Task<ErrorOr<List<T>>> LoadMultipleDataAsync<T>(
+        string storedProcedure,
+        object parameters,
+        string displayName)
+    {
+        using IDbConnection connection = new MySqlConnection(_connectionString);
+
+        try
+        {
+            IEnumerable<T> results = await connection.QueryAsync<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+            _logger.LogDebug("Retreived a list of record from {StoredProcedure} with parameters {Parameters} having values: {RetreivedRecords}", storedProcedure, parameters, results);
+            return results.ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retreive records from the database");
+            return Errors.Generic.NotFound(displayName);
+        }
+    }
 }
