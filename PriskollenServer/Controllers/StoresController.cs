@@ -20,6 +20,15 @@ public class StoresController : ApiController
         _storeService = storeService;
     }
 
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetStore(int id)
+    {
+        ErrorOr<Store> getStoreResult = await _storeService.GetStore(id);
+        return getStoreResult.Match(
+            store => Ok(MapStoreResponse(store)),
+            errors => Problem(errors));
+    }
+
     [HttpGet()]
     public async Task<IActionResult> GetAllStores()
     {

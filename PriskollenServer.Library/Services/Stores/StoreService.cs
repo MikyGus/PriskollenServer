@@ -44,6 +44,24 @@ public class StoreService : IStoreService
     }
 
     public Task<ErrorOr<List<Store>>> GetAllStoresByDistance(double latitude, double longitude) => throw new NotImplementedException();
-    public Task<ErrorOr<Store>> GetStore(int id) => throw new NotImplementedException();
+    public async Task<ErrorOr<Store>> GetStore(int id)
+    {
+        using IDbConnection connection = new MySqlConnection(_connectionString);
+        string storedProcedure = "GetStoreById";
+        var parameters = new { SearchForId = id };
+
+        try
+        {
+            Store store = await connection.QuerySingleAsync<Store>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+            _logger.LogInformation("Retreived a single record of Store: {Store}", store);
+            return store;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retreive a record from the database");
+            return Errors.Store.NotFound;
+        }
+    }
+
     public Task<ErrorOr<Updated>> UpdateStore(int id, StoreChain store) => throw new NotImplementedException();
 }

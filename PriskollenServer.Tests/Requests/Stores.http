@@ -5,3 +5,7 @@
 ### GET ALL STORES
 GET {{fullAddress}}
 Content-Type: application/json
+
+### GET STORE BY ID
+GET {{fullAddress}}/3
+Content-Type: application/json

@@ -37,6 +37,15 @@ BEGIN
 		address, city, storechain_id, created, modified ;
 END$$
 
+CREATE PROCEDURE GetStoreById(in searchForId int)
+BEGIN
+	Select id, name, image, 
+ 		ST_Y(coordinate) as latitude, ST_X(coordinate) as longitude,
+		address, city, storechain_id, created, modified 
+	from stores
+	where id = searchForId;
+END$$
+
 CREATE PROCEDURE GetAllStores()
 BEGIN
 	Select id, name, image, 
