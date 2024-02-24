@@ -20,5 +20,9 @@ public static partial class Errors
             "Store.InvalidLongitude",
             $"Longitude must be between {StoreValidator.MinLongitude} " +
             $"and {StoreValidator.MaxLongitude} inclusive to be considered valid.");
+
+        public static Error NotFound => Error.NotFound(
+            "Store.NotFound",
+            "Store not found");
     }
 }

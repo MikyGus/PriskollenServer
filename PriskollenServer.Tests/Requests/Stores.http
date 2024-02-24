@@ -1,0 +1,7 @@
+@hostAddress = https://localhost:5001
+@controller = stores
+@fullAddress = {{hostAddress}}/{{controller}}
+
+### GET ALL STORES
+GET {{fullAddress}}
+Content-Type: application/json

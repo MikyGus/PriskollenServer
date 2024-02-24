@@ -40,7 +40,7 @@ END$$
 CREATE PROCEDURE GetAllStores()
 BEGIN
 	Select id, name, image, 
-		ST_X(coordinate) as longitude, ST_Y(coordinate) as latitude,
+ 		ST_Y(coordinate) as latitude, ST_X(coordinate) as longitude,
 		address, city, storechain_id, created, modified 
 	from stores
 	order by name;
