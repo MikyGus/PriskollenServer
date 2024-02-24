@@ -11,15 +11,17 @@ using System.Data;
 namespace PriskollenServer.Library.Services.StoreChains;
 public class StoreChainService : IStoreChainService
 {
+    private readonly IDataAccess _dataAccess;
     private readonly IConfiguration _config;
     private readonly ILogger<StoreChainService> _logger;
     private readonly string _connectionString;
 
-    public StoreChainService(IConfiguration config, ILogger<StoreChainService> logger)
+    public StoreChainService(IConfiguration config, ILogger<StoreChainService> logger, IDataAccess dataAccess)
     {
         _config = config;
         _connectionString = _config.GetConnectionString("default") ?? throw new ArgumentNullException();
         _logger = logger;
+        _dataAccess = dataAccess;
     }
 
     public async Task<ErrorOr<StoreChain>> CreateStoreChain(StoreChainRequest storeChain)
@@ -43,21 +45,10 @@ public class StoreChainService : IStoreChainService
 
     public async Task<ErrorOr<StoreChain>> GetStoreChain(int id)
     {
-        using IDbConnection connection = new MySqlConnection(_connectionString);
         string storedProcedure = "GetStoreChain";
         var parameters = new { SearchForId = id };
-
-        try
-        {
-            StoreChain storeChain = await connection.QuerySingleAsync<StoreChain>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
-            _logger.LogInformation("Retreived a single record of StoreChain: {StoreChain}", storeChain);
-            return storeChain;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to retreive a record from the database");
-            return Errors.StoreChain.NotFound;
-        }
+        ErrorOr<StoreChain> storeChain = await _dataAccess.LoadSingleDataAsync<StoreChain>(storedProcedure, parameters, nameof(StoreChain));
+        return storeChain;
     }
 
     public async Task<ErrorOr<List<StoreChain>>> GetAllStoreChains()
