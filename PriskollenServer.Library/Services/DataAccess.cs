@@ -20,12 +20,12 @@ public class DataAccess : IDataAccess
         _logger = logger;
     }
 
-    public async Task<ErrorOr<T>> LoadSingleDataAsync<T>(string sql, object parameters, string displayName)
+    public async Task<ErrorOr<T>> LoadSingleDataAsync<T>(string sql, object parameters)
     {
         using IDbConnection connection = new MySqlConnection(_connectionString);
         T result = await connection.QuerySingleAsync<T>(sql, parameters);
-        _logger.LogDebug("{DisplayName} succeeded with parameters {Parameters} having value: {RetreivedRecord}",
-            displayName, parameters, result);
+        _logger.LogDebug("Succeeded with call to database with parameters {Parameters} having value: {RetreivedRecord} using sql {sql}",
+            parameters, result, sql);
         return result;
     }
 

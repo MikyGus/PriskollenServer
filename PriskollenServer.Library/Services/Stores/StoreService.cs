@@ -25,28 +25,26 @@ public class StoreService : IStoreService
 
     public async Task<ErrorOr<Store>> CreateStore(StoreRequest store)
     {
-        string displayName = "CreateStore";
         string sqlString = @"INSERT INTO stores (name, image, coordinate, address, city, storechain_id) 
 	        VALUES (@Name, @Image, Point(@Longitude, @Latitude), @address, @city, @storechain_id)
 	        RETURNING id, name, image, 
 		        ST_Y(coordinate) as latitude, ST_X(coordinate) as longitude,
 		        address, city, storechain_id, created, modified;";
+        const string logErrorMessageTemplate = "Failed to create a new Store using parameters {Parameters}";
 
         try
         {
-            ErrorOr<Store> result = await _dataAccess.LoadSingleDataAsync<Store>(sqlString, store, displayName);
+            ErrorOr<Store> result = await _dataAccess.LoadSingleDataAsync<Store>(sqlString, store);
             return result;
         }
         catch (MySqlException ex)
         {
-            _logger.LogError(ex, "{DisplayName} failed to call the database using parameters {Parameters}",
-                displayName, store);
+            _logger.LogError(ex, logErrorMessageTemplate, store);
             return Errors.Store.InvalidStoreChainId;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{DisplayName} failed to call the database using parameters {Parameters}",
-                displayName, store);
+            _logger.LogError(ex, logErrorMessageTemplate, store);
             return Errors.Store.NotFound;
         }
     }
@@ -62,10 +60,22 @@ public class StoreService : IStoreService
     public Task<ErrorOr<List<Store>>> GetAllStoresByDistance(double latitude, double longitude) => throw new NotImplementedException();
     public async Task<ErrorOr<Store>> GetStore(int id)
     {
-        string storedProcedure = "GetStoreById";
+        string sql = @"Select id, name, image, 
+ 		    ST_Y(coordinate) as latitude, ST_X(coordinate) as longitude,
+		    address, city, storechain_id, created, modified 
+	        from stores
+	        where id = searchForId;";
         var parameters = new { SearchForId = id };
-        ErrorOr<Store> result = await _dataAccess.LoadSingleDataAsync<Store>(storedProcedure, parameters, nameof(Store));
-        return result;
+        try
+        {
+            ErrorOr<Store> result = await _dataAccess.LoadSingleDataAsync<Store>(sql, parameters);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to get Store by using parameters {Parameters}", parameters);
+            return Errors.Store.NotFound;
+        }
     }
 
     public Task<ErrorOr<Updated>> UpdateStore(int id, StoreChain store) => throw new NotImplementedException();
