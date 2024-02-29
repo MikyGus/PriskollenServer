@@ -7,6 +7,6 @@ public record Store(
     double Longitude,
     string Address,
     string City,
-    int? Storechain_id,
+    int Storechain_id,
     DateTime Created,
     DateTime Modified);

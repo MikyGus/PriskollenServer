@@ -21,6 +21,10 @@ public static partial class Errors
             $"Longitude must be between {StoreValidator.MinLongitude} " +
             $"and {StoreValidator.MaxLongitude} inclusive to be considered valid.");
 
+        public static Error InvalidStoreChainId => Error.Validation(
+            "Store.InvalidStoreChainId",
+            "Provided storechain does not exist.");
+
         public static Error NotFound => Error.NotFound(
             "Store.NotFound",
             "Store not found");

@@ -20,6 +20,21 @@ public class StoresController : ApiController
         _storeService = storeService;
     }
 
+    [HttpPost]
+    public async Task<IActionResult> CreateStore(StoreRequest newStore)
+    {
+        ErrorOr<StoreRequest> storeRequestValidated = _storeValidator.Validate(newStore);
+        if (storeRequestValidated.IsError)
+        {
+            return Problem(storeRequestValidated.Errors);
+        }
+
+        ErrorOr<Store> createNewStoreResult = await _storeService.CreateStore(storeRequestValidated.Value);
+        return createNewStoreResult.Match(
+            store => CreatedAtGetStore(store),
+            errors => Problem(errors));
+    }
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetStore(int id)
     {
@@ -58,4 +73,10 @@ public class StoresController : ApiController
             yield return MapStoreResponse(store);
         }
     }
+
+    private CreatedAtActionResult CreatedAtGetStore(Store store)
+        => CreatedAtAction(
+            actionName: nameof(GetStore),
+            routeValues: new { id = store.Id },
+            value: MapStoreResponse(store));
 }

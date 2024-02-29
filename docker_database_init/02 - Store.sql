@@ -33,7 +33,7 @@ BEGIN
 	INSERT INTO stores (name, image, coordinate, address, city, storechain_id) 
 	VALUES (Name, Image, Point(Longitude, Latitude), address, city, storechain_id)
 	RETURNING id, name, image, 
-		ST_AsText(coordinate), ST_X(coordinate) as longitude, ST_Y(coordinate) as latitude,
+		ST_Y(coordinate) as latitude, ST_X(coordinate) as longitude,
 		address, city, storechain_id, created, modified ;
 END$$
 

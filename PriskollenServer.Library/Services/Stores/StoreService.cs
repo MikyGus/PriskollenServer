@@ -1,8 +1,10 @@
 ﻿using ErrorOr;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MySql.Data.MySqlClient;
 using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.Models;
+using PriskollenServer.Library.ServiceErrors;
 using PriskollenServer.Library.Services.StoreChains;
 
 namespace PriskollenServer.Library.Services.Stores;
@@ -21,7 +23,34 @@ public class StoreService : IStoreService
         _logger = logger;
     }
 
-    public Task<ErrorOr<Store>> CreateStore(StoreRequest store) => throw new NotImplementedException();
+    public async Task<ErrorOr<Store>> CreateStore(StoreRequest store)
+    {
+        string displayName = "CreateStore";
+        string sqlString = @"INSERT INTO stores (name, image, coordinate, address, city, storechain_id) 
+	        VALUES (@Name, @Image, Point(@Longitude, @Latitude), @address, @city, @storechain_id)
+	        RETURNING id, name, image, 
+		        ST_Y(coordinate) as latitude, ST_X(coordinate) as longitude,
+		        address, city, storechain_id, created, modified;";
+
+        try
+        {
+            ErrorOr<Store> result = await _dataAccess.LoadSingleDataAsync<Store>(sqlString, store, displayName);
+            return result;
+        }
+        catch (MySqlException ex)
+        {
+            _logger.LogError(ex, "{DisplayName} failed to call the database using parameters {Parameters}",
+                displayName, store);
+            return Errors.Store.InvalidStoreChainId;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "{DisplayName} failed to call the database using parameters {Parameters}",
+                displayName, store);
+            return Errors.Store.NotFound;
+        }
+    }
+
     public async Task<ErrorOr<List<Store>>> GetAllStores()
     {
         string storedProcedure = "GetAllStores";

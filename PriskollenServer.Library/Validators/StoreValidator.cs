@@ -30,6 +30,11 @@ public class StoreValidator : IStoreValidator
             errors.Add(Errors.Store.InvalidLongitude);
         }
 
+        if (store.StoreChain_id < 0)
+        {
+            errors.Add(Errors.Store.InvalidStoreChainId);
+        }
+
         return errors.Count == 0;
     }
 
