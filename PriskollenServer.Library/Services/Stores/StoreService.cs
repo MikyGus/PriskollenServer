@@ -51,10 +51,10 @@ public class StoreService : IStoreService
 
     public async Task<ErrorOr<List<Store>>> GetAllStores()
     {
-        string storedProcedure = "GetAllStores";
-        var parameters = new { };
-        ErrorOr<List<Store>> stores = await _dataAccess.LoadMultipleDataAsync<Store>(storedProcedure, parameters, nameof(Store));
-        return stores;
+        //string storedProcedure = "GetAllStores";
+        //var parameters = new { };
+        //ErrorOr<List<Store>> stores = await _dataAccess.LoadMultipleDataAsync<Store>(storedProcedure, parameters, nameof(Store));
+        return Errors.Store.NotFound;
     }
 
     public Task<ErrorOr<List<Store>>> GetAllStoresByDistance(double latitude, double longitude) => throw new NotImplementedException();

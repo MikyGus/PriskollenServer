@@ -3,7 +3,6 @@ using ErrorOr;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
-using PriskollenServer.Library.ServiceErrors;
 using System.Data;
 
 namespace PriskollenServer.Library.Services;
@@ -30,24 +29,13 @@ public class DataAccess : IDataAccess
     }
 
     public async Task<ErrorOr<List<T>>> LoadMultipleDataAsync<T>(
-        string storedProcedure,
-        object parameters,
-        string displayName)
+        string sqlString,
+        object parameters)
     {
         using IDbConnection connection = new MySqlConnection(_connectionString);
-
-        try
-        {
-            IEnumerable<T> results = await connection.QueryAsync<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
-            _logger.LogDebug("{DisplayName} succeeded with {StoredProcedure} with parameters {Parameters} having value: {RetreivedRecord}",
-                displayName, storedProcedure, parameters, results);
-            return results.ToList();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{DisplayName} failed to call the database with {StoredProcedure} using parameters {Parameters}",
-                displayName, storedProcedure, parameters);
-            return Errors.Generic.NotFound(displayName);
-        }
+        IEnumerable<T> results = await connection.QueryAsync<T>(sqlString, parameters);
+        _logger.LogDebug("Succeeded with call to database with parameters {Parameters} having value: {RetreivedRecord} using sql {sql}",
+            parameters, results, sqlString);
+        return results.ToList();
     }
 }

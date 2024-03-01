@@ -1,12 +1,9 @@
-﻿using Dapper;
-using ErrorOr;
+﻿using ErrorOr;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MySql.Data.MySqlClient;
 using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.Models;
 using PriskollenServer.Library.ServiceErrors;
-using System.Data;
 
 namespace PriskollenServer.Library.Services.StoreChains;
 public class StoreChainService : IStoreChainService
@@ -26,57 +23,84 @@ public class StoreChainService : IStoreChainService
 
     public async Task<ErrorOr<StoreChain>> CreateStoreChain(StoreChainRequest storeChain)
     {
-        using IDbConnection connection = new MySqlConnection(_connectionString);
-        string storedProcedure = "CreateStorechain";
-        var values = new { storeChain.Name, storeChain.Image };
+        string sqlString = @"INSERT INTO storechains (name, image) 
+	        VALUES (@Name, @Image)
+	        RETURNING id, name, image, created, modified;";
+        var parameters = new { storeChain.Name, storeChain.Image };
 
         try
         {
-            StoreChain result = await connection.QuerySingleAsync<StoreChain>(storedProcedure, values, commandType: CommandType.StoredProcedure);
-            _logger.LogInformation("Inserted a new StoreChain with values: {StoreChain}", result);
+            ErrorOr<StoreChain> result = await _dataAccess.LoadSingleDataAsync<StoreChain>(sqlString, parameters);
             return result;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to insert new StoreChain with values: {StoreChain}", storeChain);
+            const string logErrorMessageTemplate = "Failed to create a new StoreChain using parameters {Parameters}";
+            _logger.LogError(ex, logErrorMessageTemplate, parameters);
             return Errors.StoreChain.InsertFailure;
         }
     }
 
     public async Task<ErrorOr<StoreChain>> GetStoreChain(int id)
     {
-        string storedProcedure = "GetStoreChain";
-        var parameters = new { SearchForId = id };
-        ErrorOr<StoreChain> storeChain = await _dataAccess.LoadSingleDataAsync<StoreChain>(storedProcedure, parameters, nameof(StoreChain));
-        return storeChain;
+        string sqlString = @"Select id, name, image, created, modified 
+	        from storechains 
+	        where id = @Id
+	        order by name;";
+        var parameters = new { Id = id };
+
+        try
+        {
+            ErrorOr<StoreChain> storeChain = await _dataAccess.LoadSingleDataAsync<StoreChain>(sqlString, parameters);
+            return storeChain;
+        }
+        catch (Exception ex)
+        {
+            const string logErrorMessageTemplate = "Failed to retreive StoreChain by using parameters {Parameters}";
+            _logger.LogError(ex, logErrorMessageTemplate, parameters);
+            return Errors.StoreChain.NotFound;
+        }
     }
 
     public async Task<ErrorOr<List<StoreChain>>> GetAllStoreChains()
     {
-        string storedProcedure = "GetAllStorechains";
+        string sqlString = @"Select id, name, image, created, modified 
+            from storechains 
+            order by name;";
         var parameters = new { };
-        ErrorOr<List<StoreChain>> storeChains = await _dataAccess.LoadMultipleDataAsync<StoreChain>(storedProcedure, parameters, nameof(StoreChains));
-        return storeChains;
+
+        try
+        {
+            ErrorOr<List<StoreChain>> storeChains = await _dataAccess.LoadMultipleDataAsync<StoreChain>(sqlString, parameters);
+            return storeChains;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retreive StoreChains from the database with parameters {Parameters} using sql {sql}",
+                parameters, sqlString);
+            return Errors.StoreChain.NotFound;
+        }
     }
 
     public async Task<ErrorOr<Updated>> UpdateStoreChain(int id, StoreChainRequest storeChain)
     {
-        using IDbConnection connection = new MySqlConnection(_connectionString);
-        string storedProcedure = "UpdateStoreChain";
-        var parameters = new { SearchForId = id, storeChain.Name, storeChain.Image };
+        string sqlString = @"UPDATE storechains
+	        SET name = @Name, 
+		        image = @Image, 
+		        modified = CURRENT_TIMESTAMP()
+	        WHERE id = @Id;SELECT ROW_COUNT();";
+        var parameters = new { Id = id, storeChain.Name, storeChain.Image };
 
         try
         {
-            int affectedRows = await connection.QuerySingleAsync<int>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
-            if (affectedRows == 1)
+            ErrorOr<int> result = await _dataAccess.LoadSingleDataAsync<int>(sqlString, parameters);
+            if (result.Value == 1)
             {
                 _logger.LogInformation("Updated StoreChain with Id: {Id} to values: {StoreChain}", id, storeChain);
+                return Result.Updated;
             }
-            else
-            {
-                // TODO: Make use of transaction to roll back
-                _logger.LogError("Updated a number of {Count} StoreChain with Id: {Id} to values: {StoreChain}", affectedRows, id, storeChain);
-            }
+            // TODO: Make use of transaction to roll back
+            _logger.LogError("Updated a number of {Count} StoreChain with Id: {Id} to values: {StoreChain}", result.Value, id, storeChain);
             return Result.Updated;
         }
         catch (Exception ex)
