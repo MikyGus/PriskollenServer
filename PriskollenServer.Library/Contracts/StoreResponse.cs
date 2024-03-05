@@ -9,4 +9,5 @@ public record StoreResponse(
     string City,
     int? Storechain_id,
     DateTime Created,
-    DateTime Modified);
+    DateTime Modified,
+    double? Distance = null);

@@ -51,13 +51,47 @@ public class StoreService : IStoreService
 
     public async Task<ErrorOr<List<Store>>> GetAllStores()
     {
-        //string storedProcedure = "GetAllStores";
-        //var parameters = new { };
-        //ErrorOr<List<Store>> stores = await _dataAccess.LoadMultipleDataAsync<Store>(storedProcedure, parameters, nameof(Store));
-        return Errors.Store.NotFound;
+        string sqlString = @"Select id, name, image, 
+ 		    ST_Y(coordinate) as latitude, ST_X(coordinate) as longitude,
+		    address, city, storechain_id, created, modified 
+	        from stores
+	        order by name;";
+        var parameters = new { };
+        try
+        {
+            ErrorOr<List<Store>> result = await _dataAccess.LoadMultipleDataAsync<Store>(sqlString, parameters);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retreive Store from the database with parameters {Parameters} using sql {sql}",
+                parameters, sqlString);
+            return Errors.Store.NotFound;
+        }
     }
 
-    public Task<ErrorOr<List<Store>>> GetAllStoresByDistance(double latitude, double longitude) => throw new NotImplementedException();
+    public async Task<ErrorOr<List<Store>>> GetAllStoresByDistance(double latitude, double longitude)
+    {
+        string sqlString = @"Select id, name, image, 
+		        ST_X(coordinate) as longitude, ST_Y(coordinate) as latitude,
+	            address, city, storechain_id, created, modified,
+		        ST_DISTANCE_SPHERE(coordinate,Point(@longitude, @latitude))/1000 as distance
+	        from stores
+	        order by distance;";
+        var parameters = new { latitude, longitude };
+        try
+        {
+            ErrorOr<List<Store>> result = await _dataAccess.LoadMultipleDataAsync<Store>(sqlString, parameters);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retreive Store from the database with parameters {Parameters} using sql {sql}",
+                parameters, sqlString);
+            return Errors.Store.NotFound;
+        }
+    }
+
     public async Task<ErrorOr<Store>> GetStore(int id)
     {
         string sql = @"Select id, name, image, 
