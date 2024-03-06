@@ -28,6 +28,7 @@ try
         builder.Services.AddScoped<IStoreChainService, StoreChainService>();
         builder.Services.AddScoped<IStoreService, StoreService>();
         builder.Services.AddScoped<IStoreChainValidator, StoreChainValidator>();
+        builder.Services.AddScoped<IGpsPositionValidator, GpsPositionValidator>();
         builder.Services.AddScoped<IStoreValidator, StoreValidator>();
     }
 

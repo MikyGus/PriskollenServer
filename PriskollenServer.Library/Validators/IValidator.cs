@@ -2,6 +2,6 @@
 namespace PriskollenServer.Library.Validators;
 public interface IValidator<TRequest>
 {
-    bool IsValid(TRequest storeChain, out List<Error> errors);
-    ErrorOr<TRequest> Validate(TRequest storeChain);
+    bool IsValid(TRequest request, out List<Error> errors);
+    ErrorOr<TRequest> Validate(TRequest request);
 }

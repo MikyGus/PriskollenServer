@@ -98,7 +98,7 @@ public class StoreService : IStoreService
  		    ST_Y(coordinate) as latitude, ST_X(coordinate) as longitude,
 		    address, city, storechain_id, created, modified 
 	        from stores
-	        where id = searchForId;";
+	        where id = @searchForId;";
         var parameters = new { SearchForId = id };
         try
         {

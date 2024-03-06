@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.Models;
-using PriskollenServer.Library.ServiceErrors;
 using PriskollenServer.Library.Services.Stores;
 using PriskollenServer.Library.Validators;
 
@@ -12,13 +11,16 @@ public class StoresController : ApiController
 {
     private readonly IStoreService _storeService;
     private readonly IStoreValidator _storeValidator;
+    private readonly IGpsPositionValidator _gpsPositionValidator;
 
     public StoresController(
         IStoreValidator storeValidator,
-        IStoreService storeService)
+        IStoreService storeService,
+        IGpsPositionValidator gpsPositionValidator)
     {
         _storeValidator = storeValidator;
         _storeService = storeService;
+        _gpsPositionValidator = gpsPositionValidator;
     }
 
     [HttpPost]
@@ -48,22 +50,24 @@ public class StoresController : ApiController
     [HttpGet()]
     public async Task<IActionResult> GetAllStores(GpsRequest gpsRequest)
     {
+        ErrorOr<GpsRequest> gpsPositionRequestValidated = _gpsPositionValidator.Validate(gpsRequest);
+        if (gpsPositionRequestValidated.IsError)
+        {
+            return Problem(gpsPositionRequestValidated.Errors);
+        }
+
         ErrorOr<List<Store>> getStoresResult;
-        if (gpsRequest.Latitude is null && gpsRequest.Longitude is null)
+        if (gpsPositionRequestValidated.Value.Latitude is null)
         {
             getStoresResult = await _storeService.GetAllStores();
             return getStoresResult.Match(
                 store => Ok(MapStoreResponse(store)),
                 errors => Problem(errors));
         }
-        else if (gpsRequest.Latitude is not null && gpsRequest.Longitude is not null)
-        {
-            getStoresResult = await _storeService.GetAllStoresByDistance(gpsRequest.Latitude.Value, gpsRequest.Longitude.Value);
-            return getStoresResult.Match(
-                store => Ok(MapStoreResponse(store)),
-                errors => Problem(errors));
-        }
-        return Problem([Errors.GpsPosition.MissingLatitudeOrLongitude]);
+        getStoresResult = await _storeService.GetAllStoresByDistance(gpsRequest.Latitude!.Value, gpsRequest.Longitude!.Value);
+        return getStoresResult.Match(
+            store => Ok(MapStoreResponse(store)),
+            errors => Problem(errors));
     }
 
     private static StoreResponse MapStoreResponse(Store store)

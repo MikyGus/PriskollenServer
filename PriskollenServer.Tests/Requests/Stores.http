@@ -30,12 +30,16 @@ Content-Type: application/json
 } 
 
 ### GET ALL STORES
+### SHOULD RETURN:
+###     A list of ALL stores
 GET {{fullAddress}}
 Content-Type: application/json
 
 {}
 
 ### GET ALL STORES with distance
+### SHOULD RETURN:
+###     A list of ALL stores with the distance from the client to the store
 GET {{fullAddress}}
 Content-Type: application/json
 
@@ -46,7 +50,7 @@ Content-Type: application/json
 
 ### GET ALL STORES
 ### SHOULD RETURN:
-### ERROR: "Both Latitude and Longitude is needed for a valid position"
+###     ERROR: "Both Latitude and Longitude is needed for a valid position"
 GET {{fullAddress}}
 Content-Type: application/json
 

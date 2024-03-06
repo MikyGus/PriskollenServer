@@ -12,12 +12,12 @@ public static partial class Errors
 
         public static Error InvalidLatitude => Error.Validation(
             "Store.InvalidLatitude",
-            $"Latitude must be between {StoreValidator.MinLatitude} " +
-            $"and {StoreValidator.MaxLatitude} inclusive to be considered valid.");
+            $"Latitude must be between {GpsPositionValidator.MinLatitude} " +
+            $"and {GpsPositionValidator.MaxLatitude} inclusive to be considered valid.");
 
         public static Error InvalidLongitude => Error.Validation(
             "Store.InvalidLongitude",
-            $"Longitude must be between {StoreValidator.MinLongitude} " +
-            $"and {StoreValidator.MaxLongitude} inclusive to be considered valid.");
+            $"Longitude must be between {GpsPositionValidator.MinLongitude} " +
+            $"and {GpsPositionValidator.MaxLongitude} inclusive to be considered valid.");
     }
 }
