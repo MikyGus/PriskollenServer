@@ -95,8 +95,8 @@ public class StoreService : IStoreService
     public async Task<ErrorOr<Store>> GetStore(int id)
     {
         string sql = @"Select id, name, image, 
- 		    ST_Y(coordinate) as latitude, ST_X(coordinate) as longitude,
-		    address, city, storechain_id, created, modified 
+ 		        ST_Y(coordinate) as latitude, ST_X(coordinate) as longitude,
+		        address, city, storechain_id, created, modified 
 	        from stores
 	        where id = @searchForId;";
         var parameters = new { SearchForId = id };
@@ -112,5 +112,74 @@ public class StoreService : IStoreService
         }
     }
 
-    public Task<ErrorOr<Updated>> UpdateStore(int id, StoreChain store) => throw new NotImplementedException();
+    public async Task<ErrorOr<Store>> GetStoreWithDistance(int id, GpsRequest gpsRequest)
+    {
+        string sql = @"Select id, name, image, 
+ 		        ST_Y(coordinate) as latitude, ST_X(coordinate) as longitude,
+		        address, city, storechain_id, created, modified,
+		        ST_DISTANCE_SPHERE(coordinate,Point(@longitude, @latitude))/1000 as distance
+	        from stores
+	        where id = @searchForId;";
+        var parameters = new { SearchForId = id, gpsRequest.Latitude, gpsRequest.Longitude };
+        try
+        {
+            ErrorOr<Store> result = await _dataAccess.LoadSingleDataAsync<Store>(sql, parameters);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to get Store by using parameters {Parameters}", parameters);
+            return Errors.Store.NotFound;
+        }
+    }
+
+
+    public async Task<ErrorOr<Updated>> UpdateStore(int id, StoreRequest store)
+    {
+        string sqlString = @"UPDATE stores
+	        SET name = @Name, 
+		        image = @Image, 
+                coordinate = Point(@Longitude, @Latitude),
+                address = @Address,
+                city = @City,
+                storechain_id = @Storechain_id,
+		        modified = CURRENT_TIMESTAMP()
+	        WHERE id = @Id;SELECT ROW_COUNT();"
+        ;
+        var parameters = new
+        {
+            Id = id,
+            store.Name,
+            store.Image,
+            store.Latitude,
+            store.Longitude,
+            store.Address,
+            store.City,
+            store.StoreChain_id
+        };
+        const string logErrorMessageTemplate = "Failed to update Store with Id {Id} using parameters {Parameters}";
+
+        try
+        {
+            ErrorOr<int> result = await _dataAccess.LoadSingleDataAsync<int>(sqlString, parameters);
+            if (result.Value == 1)
+            {
+                _logger.LogInformation("Updated Store with Id: {Id} to values: {Store}", id, store);
+                return Result.Updated;
+            }
+            // TODO: Make use of transaction to roll back
+            _logger.LogError("Updated a number of {Count} Stores with Id: {Id} to values: {Store}", result.Value, id, store);
+            return Result.Updated;
+        }
+        catch (MySqlException ex)
+        {
+            _logger.LogError(ex, logErrorMessageTemplate, id, store);
+            return Errors.Store.InvalidStoreChainId;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, logErrorMessageTemplate, id, store);
+            return Errors.StoreChain.NotFound;
+        }
+    }
 }

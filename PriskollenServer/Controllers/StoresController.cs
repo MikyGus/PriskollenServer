@@ -39,9 +39,18 @@ public class StoresController : ApiController
     }
 
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetStore(int id)
+    public async Task<IActionResult> GetStore(int id, GpsRequest gpsRequest)
     {
-        ErrorOr<Store> getStoreResult = await _storeService.GetStore(id);
+        ErrorOr<GpsRequest> gpsPositionRequestValidated = _gpsPositionValidator.Validate(gpsRequest);
+        if (gpsPositionRequestValidated.IsError)
+        {
+            return Problem(gpsPositionRequestValidated.Errors);
+        }
+
+        ErrorOr<Store> getStoreResult = gpsPositionRequestValidated.Value.PositionIsProvided
+            ? await _storeService.GetStoreWithDistance(id, gpsPositionRequestValidated.Value)
+            : await _storeService.GetStore(id);
+
         return getStoreResult.Match(
             store => Ok(MapStoreResponse(store)),
             errors => Problem(errors));
@@ -56,17 +65,28 @@ public class StoresController : ApiController
             return Problem(gpsPositionRequestValidated.Errors);
         }
 
-        ErrorOr<List<Store>> getStoresResult;
-        if (gpsPositionRequestValidated.Value.Latitude is null)
-        {
-            getStoresResult = await _storeService.GetAllStores();
-            return getStoresResult.Match(
-                store => Ok(MapStoreResponse(store)),
-                errors => Problem(errors));
-        }
-        getStoresResult = await _storeService.GetAllStoresByDistance(gpsRequest.Latitude!.Value, gpsRequest.Longitude!.Value);
+        ErrorOr<List<Store>> getStoresResult = gpsPositionRequestValidated.Value.PositionIsProvided
+            ? await _storeService.GetAllStoresByDistance(gpsRequest.Latitude!.Value, gpsRequest.Longitude!.Value)
+            : await _storeService.GetAllStores();
+
         return getStoresResult.Match(
             store => Ok(MapStoreResponse(store)),
+            errors => Problem(errors));
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateStore(int id, StoreRequest storeRequest)
+    {
+        ErrorOr<StoreRequest> storeRequestValidated = _storeValidator.Validate(storeRequest);
+        if (storeRequestValidated.IsError)
+        {
+            return Problem(storeRequestValidated.Errors);
+        }
+
+        ErrorOr<Updated> updateStoreResult = await _storeService.UpdateStore(id, storeRequestValidated.Value);
+
+        return updateStoreResult.Match(
+            update => NoContent(),
             errors => Problem(errors));
     }
 
