@@ -99,7 +99,7 @@ public class StoresController : ApiController
             store.Longitude,
             store.Address,
             store.City,
-            store.Storechain_id,
+            MapStoreChainResponse(store.StoreChain),
             store.Created,
             store.Modified,
             store.Distance);
@@ -111,6 +111,13 @@ public class StoresController : ApiController
             yield return MapStoreResponse(store);
         }
     }
+
+    private static StoreChainResponse MapStoreChainResponse(StoreChain storeChain)
+    => new(storeChain.Id,
+           storeChain.Name,
+           storeChain.Image,
+           storeChain.Created,
+           storeChain.Modified);
 
     private CreatedAtActionResult CreatedAtGetStore(Store store)
         => CreatedAtAction(

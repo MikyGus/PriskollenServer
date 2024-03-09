@@ -1,4 +1,5 @@
-﻿using ErrorOr;
+﻿using Dapper;
+using ErrorOr;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
@@ -6,6 +7,7 @@ using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.Models;
 using PriskollenServer.Library.ServiceErrors;
 using PriskollenServer.Library.Services.StoreChains;
+using System.Data;
 
 namespace PriskollenServer.Library.Services.Stores;
 public class StoreService : IStoreService
@@ -114,17 +116,32 @@ public class StoreService : IStoreService
 
     public async Task<ErrorOr<Store>> GetStoreWithDistance(int id, GpsRequest gpsRequest)
     {
-        string sql = @"Select id, name, image, 
- 		        ST_Y(coordinate) as latitude, ST_X(coordinate) as longitude,
-		        address, city, storechain_id, created, modified,
-		        ST_DISTANCE_SPHERE(coordinate,Point(@longitude, @latitude))/1000 as distance
-	        from stores
-	        where id = @searchForId;";
+        string sql = @"Select s.id, s.name, s.image, 
+           ST_Y(s.coordinate) as latitude, ST_X(s.coordinate) as longitude,
+          s.address, s.city, s.storechain_id, s.created, s.modified,
+          ST_DISTANCE_SPHERE(s.coordinate,Point(@longitude, @latitude))/1000 as distance,
+                c.id, c.name, c.image, c.created, c.modified
+         from stores s
+            left join storechains c ON s.storechain_id = c.id
+         where s.id = @searchForId;";
+
         var parameters = new { SearchForId = id, gpsRequest.Latitude, gpsRequest.Longitude };
+
         try
         {
-            ErrorOr<Store> result = await _dataAccess.LoadSingleDataAsync<Store>(sql, parameters);
-            return result;
+            using IDbConnection connection = new MySqlConnection(_connectionString);
+            IEnumerable<Store> store = await connection.QueryAsync<Store, StoreChain, Store>(sql, (store, storechain) =>
+            {
+                store.StoreChain = storechain;
+                return store;
+            }, param: parameters, splitOn: "Id");
+            if (store is not null)
+            {
+                _logger.LogDebug("Successfully retreived store {Store} with parameters {Parameters}", store, parameters);
+                return store.First();
+            }
+            _logger.LogWarning("Store not found with parameters {Parameters}", parameters);
+            return Errors.Store.NotFound;
         }
         catch (Exception ex)
         {
@@ -132,7 +149,6 @@ public class StoreService : IStoreService
             return Errors.Store.NotFound;
         }
     }
-
 
     public async Task<ErrorOr<Updated>> UpdateStore(int id, StoreRequest store)
     {
