@@ -7,7 +7,7 @@ public record StoreResponse(
     double Longitude,
     string Address,
     string City,
-    StoreChainResponse StoreChain,
+    StoreChainResponse? StoreChain,
     DateTime Created,
     DateTime Modified,
     double? Distance = null);

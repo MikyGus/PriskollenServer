@@ -7,5 +7,5 @@ public class StoreRequest
     public double Longitude { get; set; }
     public string? Address { get; set; }
     public string? City { get; set; }
-    public int StoreChain_id { get; set; } = 0;
+    public int? StoreChain_id { get; set; }
 }
