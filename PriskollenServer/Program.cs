@@ -1,3 +1,6 @@
+using PriskollenServer.Library.Contracts;
+using PriskollenServer.Library.MapToResponse;
+using PriskollenServer.Library.Models;
 using PriskollenServer.Library.Services;
 using PriskollenServer.Library.Services.StoreChains;
 using PriskollenServer.Library.Services.Stores;
@@ -30,6 +33,8 @@ try
         builder.Services.AddScoped<IStoreChainValidator, StoreChainValidator>();
         builder.Services.AddScoped<IGpsPositionValidator, GpsPositionValidator>();
         builder.Services.AddScoped<IStoreValidator, StoreValidator>();
+        builder.Services.AddScoped<IMapToResponse<Store, StoreResponse>, MapToStoreResponse>();
+        builder.Services.AddScoped<IMapToResponse<StoreChain, StoreChainResponse>, MapToStoreChainResponse>();
     }
 
     WebApplication app = builder.Build();

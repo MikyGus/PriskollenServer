@@ -1,6 +1,7 @@
 ﻿using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using PriskollenServer.Library.Contracts;
+using PriskollenServer.Library.MapToResponse;
 using PriskollenServer.Library.Models;
 using PriskollenServer.Library.Services.Stores;
 using PriskollenServer.Library.Validators;
@@ -12,15 +13,18 @@ public class StoresController : ApiController
     private readonly IStoreService _storeService;
     private readonly IStoreValidator _storeValidator;
     private readonly IGpsPositionValidator _gpsPositionValidator;
+    private IMapToResponse<Store, StoreResponse> _map;
 
     public StoresController(
         IStoreValidator storeValidator,
         IStoreService storeService,
-        IGpsPositionValidator gpsPositionValidator)
+        IGpsPositionValidator gpsPositionValidator,
+        IMapToResponse<Store, StoreResponse> mapToResponse)
     {
         _storeValidator = storeValidator;
         _storeService = storeService;
         _gpsPositionValidator = gpsPositionValidator;
+        _map = mapToResponse;
     }
 
     [HttpPost]
@@ -52,7 +56,7 @@ public class StoresController : ApiController
             : await _storeService.GetStore(id);
 
         return getStoreResult.Match(
-            store => Ok(MapStoreResponse(store)),
+            store => Ok(_map.MapToResponse(store)),
             errors => Problem(errors));
     }
 
@@ -70,7 +74,7 @@ public class StoresController : ApiController
             : await _storeService.GetAllStores();
 
         return getStoresResult.Match(
-            store => Ok(MapStoreResponse(store)),
+            store => Ok(_map.MapToResponse(store)),
             errors => Problem(errors));
     }
 
@@ -90,38 +94,9 @@ public class StoresController : ApiController
             errors => Problem(errors));
     }
 
-    private static StoreResponse MapStoreResponse(Store store)
-        => new(
-            store.Id,
-            store.Name,
-            store.Image,
-            store.Latitude,
-            store.Longitude,
-            store.Address,
-            store.City,
-            store.StoreChain is not null ? MapStoreChainResponse(store.StoreChain) : null,
-            store.Created,
-            store.Modified,
-            store.Distance);
-
-    private static IEnumerable<StoreResponse> MapStoreResponse(IEnumerable<Store> stores)
-    {
-        foreach (Store store in stores)
-        {
-            yield return MapStoreResponse(store);
-        }
-    }
-
-    private static StoreChainResponse MapStoreChainResponse(StoreChain storeChain)
-    => new(storeChain.Id,
-           storeChain.Name,
-           storeChain.Image,
-           storeChain.Created,
-           storeChain.Modified);
-
     private CreatedAtActionResult CreatedAtGetStore(Store store)
         => CreatedAtAction(
             actionName: nameof(GetStore),
             routeValues: new { id = store.Id },
-            value: MapStoreResponse(store));
+            value: _map.MapToResponse(store));
 }

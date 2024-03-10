@@ -1,6 +1,7 @@
 ﻿using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using PriskollenServer.Library.Contracts;
+using PriskollenServer.Library.MapToResponse;
 using PriskollenServer.Library.Models;
 using PriskollenServer.Library.Services.StoreChains;
 using PriskollenServer.Library.Validators;
@@ -11,13 +12,16 @@ public class StoreChainsController : ApiController
 {
     private readonly IStoreChainService _storeChainService;
     private IStoreChainValidator _validator;
+    private IMapToResponse<StoreChain, StoreChainResponse> _map;
 
     public StoreChainsController(
         IStoreChainService storeChainService,
-        IStoreChainValidator validator)
+        IStoreChainValidator validator,
+        IMapToResponse<StoreChain, StoreChainResponse> mapToResponse)
     {
         _storeChainService = storeChainService;
         _validator = validator;
+        _map = mapToResponse;
     }
 
     [HttpPost]
@@ -39,7 +43,7 @@ public class StoreChainsController : ApiController
     {
         ErrorOr<StoreChain> getStoreChainResult = await _storeChainService.GetStoreChain(id);
         return getStoreChainResult.Match(
-            storeChain => Ok(MapStoreChainResponse(storeChain)),
+            storeChain => Ok(_map.MapToResponse(storeChain)),
             errors => Problem(errors));
     }
 
@@ -49,7 +53,7 @@ public class StoreChainsController : ApiController
         ErrorOr<List<StoreChain>> getStoreChainsResult = await _storeChainService.GetAllStoreChains();
 
         return getStoreChainsResult.Match(
-            storeChains => Ok(MapStoreChainResponse(storeChains)),
+            storeChains => Ok(_map.MapToResponse(storeChains)),
             errors => Problem(errors));
     }
 
@@ -68,24 +72,9 @@ public class StoreChainsController : ApiController
             errors => Problem(errors));
     }
 
-    private static StoreChainResponse MapStoreChainResponse(StoreChain storeChain)
-        => new(storeChain.Id,
-               storeChain.Name,
-               storeChain.Image,
-               storeChain.Created,
-               storeChain.Modified);
-
-    private static IEnumerable<StoreChainResponse> MapStoreChainResponse(IEnumerable<StoreChain> storeChains)
-    {
-        foreach (StoreChain storeChain in storeChains)
-        {
-            yield return MapStoreChainResponse(storeChain);
-        }
-    }
-
     private CreatedAtActionResult CreatedAtGetStoreChain(StoreChain storeChain)
         => CreatedAtAction(
             actionName: nameof(GetStoreChain),
             routeValues: new { id = storeChain.Id },
-            value: MapStoreChainResponse(storeChain));
+            value: _map.MapToResponse(storeChain));
 }
