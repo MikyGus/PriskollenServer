@@ -6,7 +6,7 @@ namespace PriskollenServer.Tests.Tests.Validators;
 public class StoreChainValidatorTests
 {
     private StoreChainRequest _storeChain;
-    private IValidator _sut;
+    private IStoreChainValidator _sut;
 
     public StoreChainValidatorTests()
     {
@@ -20,7 +20,7 @@ public class StoreChainValidatorTests
     [InlineData("123", true)]
     [InlineData("123456789012345678901234567890", true)]
     [InlineData("1234567890123456789012345678901", false)]
-    public void StoreChainValidator_ValidateStoreChain_ReturnIfValid(string storeChainName, bool isValid)
+    public void StoreChainValidator_ValidateStoreChainName_ReturnIfValid(string storeChainName, bool isValid)
     {
         // Arrange
         StoreChainRequest storeChain = _storeChain with { Name = storeChainName };

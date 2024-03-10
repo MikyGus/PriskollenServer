@@ -1,10 +1,13 @@
 ﻿namespace PriskollenServer.Library.Contracts;
 public record StoreResponse(
-    Guid Id,
+    int Id,
     string Name,
-    string Coordinates,
+    string Image,
+    double Latitude,
+    double Longitude,
     string Address,
     string City,
-    Guid StoreChain,
+    StoreChainResponse StoreChain,
     DateTime Created,
-    DateTime Modified);
+    DateTime Modified,
+    double? Distance = null);

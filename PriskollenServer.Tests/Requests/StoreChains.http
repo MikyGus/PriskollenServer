@@ -2,18 +2,6 @@
 @controller = storechains
 @fullAddress = {{hostAddress}}/{{controller}}
 
-### GET STORECHAIN BY ID
-GET {{fullAddress}}/2
-Content-Type: application/json
-
-### GET ALL STORECHAINS
-
-GET {{fullAddress}}
-Content-Type: application/json
-
-### GET STORECHAIN
-GET https://localhost:5001/StoreChains/6
-
 ### CREATE STORECHAINS
 POST {{fullAddress}}
 Content-Type: application/json
@@ -32,6 +20,17 @@ Content-Type: application/json
     "Name": "M",
     "Image": "miky.png"
 } 
+
+### GET STORECHAIN BY ID
+GET {{fullAddress}}/3
+Content-Type: application/json
+
+### GET ALL STORECHAINS
+GET {{fullAddress}}
+Content-Type: application/json
+
+### GET STORECHAIN
+GET https://localhost:5001/StoreChains/6
 
 ### UPDATE STORECHAIN BY ID
 PUT {{fullAddress}}/1

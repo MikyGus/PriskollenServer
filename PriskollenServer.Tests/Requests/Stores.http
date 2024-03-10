@@ -1,0 +1,102 @@
+@hostAddress = https://localhost:5001
+@controller = stores
+@fullAddress = {{hostAddress}}/{{controller}}
+
+########################### CREATE STORE #############################
+### CREATE STORE, with all info provided
+POST {{fullAddress}}
+Content-Type: application/json
+
+{
+    "Name": "Coop",
+    "Image": "coop.png",
+    "Latitude": "56.90251723856158", 
+    "Longitude": "14.829480127231779",
+    "Address": "Norremarksvägen 1",
+    "City": "Växjö",
+    "StoreChain_id": "3"
+} 
+
+### CREATE STORE, with NO StoreChain
+POST {{fullAddress}}
+Content-Type: application/json
+
+{
+    "Name": "Brödernas frukt och grönt",
+    "Image": "",
+    "Latitude": 56.88732437738126, 
+    "Longitude": 14.763744568724935,
+    "Address": "Verkstadsgatan 18C",
+    "City": "Växjö"
+} 
+
+########################### GET ALL STORES #############################
+### GET ALL STORES - No client position
+### SHOULD RETURN:
+###     A list of ALL stores
+GET {{fullAddress}}
+Content-Type: application/json
+
+{}
+
+### GET ALL STORES with distance
+### SHOULD RETURN:
+###     A list of ALL stores with the distance from the client to the store
+GET {{fullAddress}}
+Content-Type: application/json
+
+{
+    "Latitude": 56.90599488019165, 
+    "Longitude": 14.786982360404973
+}
+
+### GET ALL STORES
+### SHOULD RETURN:
+###     ERROR: "Both Latitude and Longitude is needed for a valid position"
+GET {{fullAddress}}
+Content-Type: application/json
+
+{
+    "Longitude": 14.786982360404973
+}
+
+########################### Get store by ID #############################
+### GET STORE BY ID - No Position
+GET {{fullAddress}}/1
+Content-Type: application/json
+
+{}
+
+### GET STORE BY ID - With Position
+GET {{fullAddress}}/1
+Content-Type: application/json
+
+{
+    "Latitude": 56.90599488019165, 
+    "Longitude": 14.786982360404973
+}
+
+### GET STORE BY ID - Error Position
+### SHOULD RETURN:
+###     ERROR: "Both Latitude and Longitude is needed for a valid position"
+GET {{fullAddress}}/1
+Content-Type: application/json
+
+{
+    "Latitude": 56.90599488019165
+}
+
+
+########################### Update store by ID #############################
+PUT {{fullAddress}}/1
+Content-Type: application/json
+
+{
+    "Name": "NewCoop",
+    "Image": "newcoop.png",
+    "Latitude": "26.90251723856158", 
+    "Longitude": "4.829480127231779",
+    "Address": "NewNorremarksvägen 1",
+    "City": "NewVäxjö",
+    "StoreChain_id": "2"
+}

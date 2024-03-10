@@ -1,4 +1,6 @@
+using PriskollenServer.Library.Services;
 using PriskollenServer.Library.Services.StoreChains;
+using PriskollenServer.Library.Services.Stores;
 using PriskollenServer.Library.Validators;
 using Serilog;
 
@@ -22,8 +24,12 @@ try
         builder.Host.UseSerilog();
 
         builder.Services.AddControllers();
-        builder.Services.AddScoped<IStoreChainService, StoreChainServiceDatabase>();
-        builder.Services.AddScoped<IValidator, StoreChainValidator>();
+        builder.Services.AddScoped<IDataAccess, DataAccess>();
+        builder.Services.AddScoped<IStoreChainService, StoreChainService>();
+        builder.Services.AddScoped<IStoreService, StoreService>();
+        builder.Services.AddScoped<IStoreChainValidator, StoreChainValidator>();
+        builder.Services.AddScoped<IGpsPositionValidator, GpsPositionValidator>();
+        builder.Services.AddScoped<IStoreValidator, StoreValidator>();
     }
 
     WebApplication app = builder.Build();

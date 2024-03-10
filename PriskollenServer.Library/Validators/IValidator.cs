@@ -1,9 +1,7 @@
 ﻿using ErrorOr;
-using PriskollenServer.Library.Contracts;
-
 namespace PriskollenServer.Library.Validators;
-public interface IValidator
+public interface IValidator<TRequest>
 {
-    bool IsValid(StoreChainRequest storeChain, out List<Error> errors);
-    ErrorOr<StoreChainRequest> Validate(StoreChainRequest storeChain);
+    bool IsValid(TRequest request, out List<Error> errors);
+    ErrorOr<TRequest> Validate(TRequest request);
 }

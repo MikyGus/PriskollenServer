@@ -1,12 +1,16 @@
 CREATE TABLE storechains (
 	id int auto_increment,
-	name varchar(50) not null,
+	name varchar(40) not null,
 	image varchar(255),
 	created timestamp default current_timestamp,
 	modified timestamp default current_timestamp,
 
 	primary key(id)
 );
+
+# A hack to set id of storechains to 0
+INSERT INTO storechains (id, name, image) VALUES (-1, 'No Chain', null);
+UPDATE storechains SET id = 0 where id = -1;
 
 INSERT INTO storechains (name, image) VALUES
 ('Ica', null),
@@ -36,10 +40,15 @@ BEGIN
 	order by name;
 END$$
 
-CREATE PROCEDURE UpdateStoreChain(in SearchForId int, in Name varchar(40), in Image varchar(40))
+CREATE PROCEDURE UpdateStoreChain(
+	in SearchForId int, 
+	in Name varchar(40), 
+	in Image varchar(40))
 BEGIN
 	UPDATE storechains
-	SET name = Name, image = Image, modified = CURRENT_TIMESTAMP()
+	SET name = Name, 
+		image = Image, 
+		modified = CURRENT_TIMESTAMP()
 	WHERE id = SearchForId;
 	SELECT ROW_COUNT(); 
 END$$

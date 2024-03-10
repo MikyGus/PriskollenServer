@@ -3,7 +3,7 @@ using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.ServiceErrors;
 
 namespace PriskollenServer.Library.Validators;
-public class StoreChainValidator : IValidator
+public class StoreChainValidator : IStoreChainValidator
 {
     public const int MinNameLength = 3;
     public const int MaxNameLength = 30;
