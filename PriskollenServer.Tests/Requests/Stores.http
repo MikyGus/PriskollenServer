@@ -62,7 +62,7 @@ Content-Type: application/json
 
 ########################### Get store by ID #############################
 ### GET STORE BY ID - No Position
-GET {{fullAddress}}/1
+GET {{fullAddress}}/5
 Content-Type: application/json
 
 {}
@@ -99,4 +99,17 @@ Content-Type: application/json
     "Address": "NewNorremarksvägen 1",
     "City": "NewVäxjö",
     "StoreChain_id": "2"
+}
+
+### Update with no storeChain
+PUT {{fullAddress}}/1
+Content-Type: application/json
+
+{
+    "Name": "NewCoop",
+    "Image": "newcoop.png",
+    "Latitude": "26.90251723856158", 
+    "Longitude": "4.829480127231779",
+    "Address": "NewNorremarksvägen 1",
+    "City": "NewVäxjö"
 }

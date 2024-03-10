@@ -8,10 +8,6 @@ CREATE TABLE storechains (
 	primary key(id)
 );
 
-# A hack to set id of storechains to 0
-INSERT INTO storechains (id, name, image) VALUES (-1, 'No Chain', null);
-UPDATE storechains SET id = 0 where id = -1;
-
 INSERT INTO storechains (name, image) VALUES
 ('Ica', null),
 ('City Gross', null),

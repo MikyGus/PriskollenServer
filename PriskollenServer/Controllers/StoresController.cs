@@ -99,7 +99,7 @@ public class StoresController : ApiController
             store.Longitude,
             store.Address,
             store.City,
-            MapStoreChainResponse(store.StoreChain),
+            store.StoreChain is not null ? MapStoreChainResponse(store.StoreChain) : null,
             store.Created,
             store.Modified,
             store.Distance);
