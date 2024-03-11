@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using ErrorOr;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using PriskollenServer.Library.Contracts;
@@ -12,17 +11,13 @@ using System.Data;
 namespace PriskollenServer.Library.Services.Stores;
 public class StoreService : IStoreService
 {
-    private readonly IDataAccess _dataAccess;
-    private readonly IConfiguration _config;
     private readonly ILogger<StoreChainService> _logger;
-    private readonly string _connectionString;
+    private readonly IDbContext _dbContext;
 
-    public StoreService(IDataAccess dataAccess, IConfiguration config, ILogger<StoreChainService> logger)
+    public StoreService(ILogger<StoreChainService> logger, IDbContext dbContext)
     {
-        _dataAccess = dataAccess;
-        _config = config;
-        _connectionString = _config.GetConnectionString("default") ?? throw new ArgumentNullException();
         _logger = logger;
+        _dbContext = dbContext;
     }
 
     public async Task<ErrorOr<Store>> CreateStore(StoreRequest store)
@@ -34,13 +29,10 @@ public class StoreService : IStoreService
 
         try
         {
-            ErrorOr<int> newStoreId = await _dataAccess.LoadSingleDataAsync<int>(sqlString, store);
-            if (newStoreId.IsError == false)
-            {
-                ErrorOr<Store> newStore = await GetStore(newStoreId.Value);
-                return newStore;
-            }
-            return newStoreId.Errors;
+            using IDbConnection connection = _dbContext.CreateConnection();
+            int result = await connection.QuerySingleAsync<int>(sqlString, store);
+            ErrorOr<Store> newStore = await GetStore(result);
+            return newStore;
         }
         catch (MySqlException ex)
         {
@@ -66,7 +58,7 @@ public class StoreService : IStoreService
         var parameters = new { };
         try
         {
-            using IDbConnection connection = new MySqlConnection(_connectionString);
+            using IDbConnection connection = _dbContext.CreateConnection();
             IEnumerable<Store> stores = await connection.QueryAsync<Store, StoreChain, Store>(sql, (store, storechain) =>
             {
                 store.StoreChain = storechain;
@@ -101,7 +93,7 @@ public class StoreService : IStoreService
         var parameters = new { latitude, longitude };
         try
         {
-            using IDbConnection connection = new MySqlConnection(_connectionString);
+            using IDbConnection connection = _dbContext.CreateConnection();
             IEnumerable<Store> stores = await connection.QueryAsync<Store, StoreChain, Store>(sql, (store, storechain) =>
             {
                 store.StoreChain = storechain;
@@ -136,7 +128,7 @@ public class StoreService : IStoreService
         var parameters = new { SearchForId = id };
         try
         {
-            using IDbConnection connection = new MySqlConnection(_connectionString);
+            using IDbConnection connection = _dbContext.CreateConnection();
             IEnumerable<Store> store = await connection.QueryAsync<Store, StoreChain, Store>(sql, (store, storechain) =>
             {
                 store.StoreChain = storechain;
@@ -172,7 +164,7 @@ public class StoreService : IStoreService
 
         try
         {
-            using IDbConnection connection = new MySqlConnection(_connectionString);
+            using IDbConnection connection = _dbContext.CreateConnection();
             IEnumerable<Store> store = await connection.QueryAsync<Store, StoreChain, Store>(sql, (store, storechain) =>
             {
                 store.StoreChain = storechain;
@@ -220,14 +212,15 @@ public class StoreService : IStoreService
 
         try
         {
-            ErrorOr<int> result = await _dataAccess.LoadSingleDataAsync<int>(sqlString, parameters);
-            if (result.Value == 1)
+            using IDbConnection connection = _dbContext.CreateConnection();
+            int result = await connection.QuerySingleAsync<int>(sqlString, parameters);
+            if (result == 1)
             {
                 _logger.LogInformation("Updated Store with Id: {Id} to values: {Store}", id, store);
                 return Result.Updated;
             }
             // TODO: Make use of transaction to roll back
-            _logger.LogError("Updated a number of {Count} Stores with Id: {Id} to values: {Store}", result.Value, id, store);
+            _logger.LogError("Updated a number of {Count} Stores with Id: {Id} to values: {Store}", result, id, store);
             return Result.Updated;
         }
         catch (MySqlException ex)

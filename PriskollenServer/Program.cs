@@ -28,6 +28,7 @@ try
 
         builder.Services.AddControllers();
         builder.Services.AddScoped<IDataAccess, DataAccess>();
+        builder.Services.AddScoped<IDbContext, DbDapperContext>();
         builder.Services.AddScoped<IStoreChainService, StoreChainService>();
         builder.Services.AddScoped<IStoreService, StoreService>();
         builder.Services.AddScoped<IStoreChainValidator, StoreChainValidator>();
