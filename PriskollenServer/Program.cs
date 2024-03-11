@@ -27,7 +27,6 @@ try
         builder.Host.UseSerilog();
 
         builder.Services.AddControllers();
-        builder.Services.AddScoped<IDataAccess, DataAccess>();
         builder.Services.AddScoped<IDbContext, DbDapperContext>();
         builder.Services.AddScoped<IStoreChainService, StoreChainService>();
         builder.Services.AddScoped<IStoreService, StoreService>();

@@ -1,24 +1,21 @@
-﻿using ErrorOr;
-using Microsoft.Extensions.Configuration;
+﻿using Dapper;
+using ErrorOr;
 using Microsoft.Extensions.Logging;
 using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.Models;
 using PriskollenServer.Library.ServiceErrors;
+using System.Data;
 
 namespace PriskollenServer.Library.Services.StoreChains;
 public class StoreChainService : IStoreChainService
 {
-    private readonly IDataAccess _dataAccess;
-    private readonly IConfiguration _config;
     private readonly ILogger<StoreChainService> _logger;
-    private readonly string _connectionString;
+    private readonly IDbContext _dbContext;
 
-    public StoreChainService(IConfiguration config, ILogger<StoreChainService> logger, IDataAccess dataAccess)
+    public StoreChainService(ILogger<StoreChainService> logger, IDbContext dbContext)
     {
-        _config = config;
-        _connectionString = _config.GetConnectionString("default") ?? throw new ArgumentNullException();
         _logger = logger;
-        _dataAccess = dataAccess;
+        _dbContext = dbContext;
     }
 
     public async Task<ErrorOr<StoreChain>> CreateStoreChain(StoreChainRequest storeChain)
@@ -30,7 +27,8 @@ public class StoreChainService : IStoreChainService
 
         try
         {
-            ErrorOr<StoreChain> result = await _dataAccess.LoadSingleDataAsync<StoreChain>(sqlString, parameters);
+            using IDbConnection connection = _dbContext.CreateConnection();
+            StoreChain result = await connection.QuerySingleAsync<StoreChain>(sqlString, parameters);
             return result;
         }
         catch (Exception ex)
@@ -51,8 +49,9 @@ public class StoreChainService : IStoreChainService
 
         try
         {
-            ErrorOr<StoreChain> storeChain = await _dataAccess.LoadSingleDataAsync<StoreChain>(sqlString, parameters);
-            return storeChain;
+            using IDbConnection connection = _dbContext.CreateConnection();
+            StoreChain result = await connection.QuerySingleAsync<StoreChain>(sqlString, parameters);
+            return result;
         }
         catch (Exception ex)
         {
@@ -71,8 +70,9 @@ public class StoreChainService : IStoreChainService
 
         try
         {
-            ErrorOr<List<StoreChain>> storeChains = await _dataAccess.LoadMultipleDataAsync<StoreChain>(sqlString, parameters);
-            return storeChains;
+            using IDbConnection connection = _dbContext.CreateConnection();
+            IEnumerable<StoreChain> result = await connection.QueryAsync<StoreChain>(sqlString, parameters);
+            return result.ToList();
         }
         catch (Exception ex)
         {
@@ -93,14 +93,15 @@ public class StoreChainService : IStoreChainService
 
         try
         {
-            ErrorOr<int> result = await _dataAccess.LoadSingleDataAsync<int>(sqlString, parameters);
-            if (result.Value == 1)
+            using IDbConnection connection = _dbContext.CreateConnection();
+            int result = await connection.QuerySingleAsync<int>(sqlString, parameters);
+            if (result == 1)
             {
                 _logger.LogInformation("Updated StoreChain with Id: {Id} to values: {StoreChain}", id, storeChain);
                 return Result.Updated;
             }
             // TODO: Make use of transaction to roll back
-            _logger.LogError("Updated a number of {Count} StoreChain with Id: {Id} to values: {StoreChain}", result.Value, id, storeChain);
+            _logger.LogError("Updated a number of {Count} StoreChain with Id: {Id} to values: {StoreChain}", result, id, storeChain);
             return Result.Updated;
         }
         catch (Exception ex)
