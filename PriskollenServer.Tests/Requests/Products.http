@@ -7,7 +7,7 @@ POST {{fullAddress}}
 Content-Type: application/json
 
 {
-    "Barcode": "44444",
+    "Barcode": "44443",
     "Name": "Chips Onion",
     "Brand": "OLW",
     "Image": "img.jpg",
@@ -15,3 +15,10 @@ Content-Type: application/json
     "VolumeWithLiquid": null,
     "VolumeUnit": "gr"
 }
+
+######## GET PRODUCT BY ID ################
+GET {{fullAddress}}/2
+
+###
+
+GET https://localhost:5001/Products/7

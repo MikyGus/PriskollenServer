@@ -38,7 +38,10 @@ public class ProductsController : ApiController
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetProduct(int id)
     {
-        return Ok();
+        ErrorOr<Product> getProductByIdResult = await _productService.GetProductById(id);
+        return getProductByIdResult.Match(
+            product => Ok(_map.MapToResponse(product)),
+            errors => Problem(errors));
     }
 
     private CreatedAtActionResult CreatedAtGetProduct(Product product)

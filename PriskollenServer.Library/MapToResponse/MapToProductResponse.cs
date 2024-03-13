@@ -21,8 +21,8 @@ public class MapToProductResponse : IMapToResponse<Product, ProductResponse>
             Brand = model.Brand,
             Image = model.Image,
             Volume = model.Volume,
-            VolumeWithLiquid = model.VolumeWithLiquid,
-            VolumeUnit = model.VolumeUnit,
+            VolumeWithLiquid = model.Volume_With_Liquid,
+            VolumeUnit = model.Volume_Unit,
             Created = model.Created,
             Modified = model.Modified
         };

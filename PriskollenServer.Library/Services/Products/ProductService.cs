@@ -28,8 +28,11 @@ public class ProductService : IProductService
         {
             using IDbConnection connection = _dbContext.CreateConnection();
             int result = await connection.QuerySingleAsync<int>(sqlQuery, newProduct);
-            Product product = new() { Id = result };
-            _logger.LogDebug("Successfully created a new {Model} with the result {Result} using parameters {Parameters}", nameof(Product), result, product);
+            ErrorOr<Product> product = await GetProductById(result);
+            if (product.IsError == false)
+            {
+                _logger.LogDebug("Successfully created a new {Model} with the result {Result} using parameters {Parameters}", nameof(Product), result, product);
+            }
             return product;
         }
         catch (Exception ex)
@@ -41,6 +44,25 @@ public class ProductService : IProductService
 
     public Task<ErrorOr<List<Product>>> GetAllProducts() => throw new NotImplementedException();
     public Task<ErrorOr<Product>> GetProductByBarcode(string barcode) => throw new NotImplementedException();
-    public Task<ErrorOr<Product>> GetProductById(int id) => throw new NotImplementedException();
+    public async Task<ErrorOr<Product>> GetProductById(int id)
+    {
+        const string sqlQuery = @"SELECT id, barcode, name, brand, image, volume, volume_with_liquid, volume_unit, created, modified
+                FROM products WHERE id=@Id;";
+        var parameters = new { id };
+
+        try
+        {
+            using IDbConnection connection = _dbContext.CreateConnection();
+            Product product = await connection.QuerySingleAsync<Product>(sqlQuery, parameters);
+            _logger.LogDebug("Successfully retreived a {Model} with the result {Result} using parameters {Parameters}", nameof(Product), product, product);
+            return product;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retreive {Model} using parameters {Parameters}", nameof(Product), parameters);
+            return Errors.Product.NotFound;
+        }
+    }
+
     public Task<ErrorOr<Updated>> UpdateProduct(int id, ProductRequest product) => throw new NotImplementedException();
 }
