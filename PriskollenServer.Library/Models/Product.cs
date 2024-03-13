@@ -1,5 +1,5 @@
-﻿namespace PriskollenServer.Library.Contracts;
-public class ProductResponse
+﻿namespace PriskollenServer.Library.Models;
+public class Product
 {
     public int Id { get; set; }
     public string Barcode { get; set; } = string.Empty;

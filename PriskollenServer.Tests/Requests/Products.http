@@ -1,0 +1,17 @@
+@hostAddress = https://localhost:5001
+@controller = products
+@fullAddress = {{hostAddress}}/{{controller}}
+
+######## CREATE PRODUCT ################
+POST {{fullAddress}}
+Content-Type: application/json
+
+{
+    "Barcode": "44444",
+    "Name": "Chips Onion",
+    "Brand": "OLW",
+    "Image": "img.jpg",
+    "Volume": 250,
+    "VolumeWithLiquid": null,
+    "VolumeUnit": "gr"
+}
