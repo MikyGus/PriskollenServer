@@ -1,0 +1,44 @@
+@hostAddress = https://localhost:5001
+@controller = products
+@fullAddress = {{hostAddress}}/{{controller}}
+
+######## CREATE PRODUCT ################
+POST {{fullAddress}}
+Content-Type: application/json
+
+{
+    "Barcode": "44443",
+    "Name": "Chips Onion",
+    "Brand": "OLW",
+    "Image": "img.jpg",
+    "Volume": 250,
+    "VolumeWithLiquid": null,
+    "VolumeUnit": "gr"
+}
+
+######## GET ALL PRODUCTS ################
+GET {{fullAddress}}
+
+######## GET PRODUCT BY ID ################
+GET {{fullAddress}}/3
+
+######## GET PRODUCT BY BARCODE ################
+GET {{fullAddress}}/barcode/11111
+
+###
+
+GET https://localhost:5001/Products/7
+
+######## UPDATE PRODUCT ################
+PUT {{fullAddress}}/3
+Content-Type: application/json
+
+{
+    "Barcode": "00999",
+    "Name": "Chips Mega Onion",
+    "Brand": "OLW",
+    "Image": "img2.jpg",
+    "Volume": 350,
+    "VolumeWithLiquid": null,
+    "VolumeUnit": "grammy"
+}

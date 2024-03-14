@@ -195,8 +195,7 @@ public class StoreService : IStoreService
                 city = @City,
                 storechain_id = @Storechain_id,
 		        modified = CURRENT_TIMESTAMP()
-	        WHERE id = @Id;SELECT ROW_COUNT();"
-        ;
+	        WHERE id = @Id;SELECT ROW_COUNT();";
         var parameters = new
         {
             Id = id,

@@ -2,6 +2,7 @@ using PriskollenServer.Library.Contracts;
 using PriskollenServer.Library.MapToResponse;
 using PriskollenServer.Library.Models;
 using PriskollenServer.Library.Services;
+using PriskollenServer.Library.Services.Products;
 using PriskollenServer.Library.Services.StoreChains;
 using PriskollenServer.Library.Services.Stores;
 using PriskollenServer.Library.Validators;
@@ -28,13 +29,19 @@ try
 
         builder.Services.AddControllers();
         builder.Services.AddScoped<IDbContext, DbDapperContext>();
+
         builder.Services.AddScoped<IStoreChainService, StoreChainService>();
         builder.Services.AddScoped<IStoreService, StoreService>();
+        builder.Services.AddScoped<IProductService, ProductService>();
+
         builder.Services.AddScoped<IStoreChainValidator, StoreChainValidator>();
         builder.Services.AddScoped<IGpsPositionValidator, GpsPositionValidator>();
         builder.Services.AddScoped<IStoreValidator, StoreValidator>();
+        builder.Services.AddScoped<IValidator<ProductRequest>, ProductValidator>();
+
         builder.Services.AddScoped<IMapToResponse<Store, StoreResponse>, MapToStoreResponse>();
         builder.Services.AddScoped<IMapToResponse<StoreChain, StoreChainResponse>, MapToStoreChainResponse>();
+        builder.Services.AddScoped<IMapToResponse<Product, ProductResponse>, MapToProductResponse>();
     }
 
     WebApplication app = builder.Build();
