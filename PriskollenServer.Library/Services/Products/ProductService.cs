@@ -42,8 +42,44 @@ public class ProductService : IProductService
         }
     }
 
-    public Task<ErrorOr<List<Product>>> GetAllProducts() => throw new NotImplementedException();
-    public Task<ErrorOr<Product>> GetProductByBarcode(string barcode) => throw new NotImplementedException();
+    public async Task<ErrorOr<List<Product>>> GetAllProducts()
+    {
+        const string sqlQuery = @"SELECT id, barcode, name, brand, image, volume, volume_with_liquid, volume_unit, created, modified
+                FROM products";
+        try
+        {
+            using IDbConnection connection = _dbContext.CreateConnection();
+            IEnumerable<Product> products = await connection.QueryAsync<Product>(sqlQuery);
+            _logger.LogDebug("Successfully retreived a collection of {Model} with the result {Result}", nameof(Product), products);
+            return products.ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retreive {Model}", nameof(Product));
+            return Errors.Product.NotFound;
+        }
+    }
+
+    public async Task<ErrorOr<Product>> GetProductByBarcode(string barcode)
+    {
+        const string sqlQuery = @"SELECT id, barcode, name, brand, image, volume, volume_with_liquid, volume_unit, created, modified
+                FROM products WHERE barcode=@Barcode;";
+        var parameters = new { barcode };
+
+        try
+        {
+            using IDbConnection connection = _dbContext.CreateConnection();
+            Product product = await connection.QuerySingleAsync<Product>(sqlQuery, parameters);
+            _logger.LogDebug("Successfully retreived a {Model} with the result {Result} using parameters {Parameters}", nameof(Product), product, product);
+            return product;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retreive {Model} using parameters {Parameters}", nameof(Product), parameters);
+            return Errors.Product.NotFound;
+        }
+    }
+
     public async Task<ErrorOr<Product>> GetProductById(int id)
     {
         const string sqlQuery = @"SELECT id, barcode, name, brand, image, volume, volume_with_liquid, volume_unit, created, modified

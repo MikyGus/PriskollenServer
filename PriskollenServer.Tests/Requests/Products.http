@@ -16,8 +16,14 @@ Content-Type: application/json
     "VolumeUnit": "gr"
 }
 
+######## GET ALL PRODUCTS ################
+GET {{fullAddress}}
+
 ######## GET PRODUCT BY ID ################
 GET {{fullAddress}}/2
+
+######## GET PRODUCT BY BARCODE ################
+GET {{fullAddress}}/barcode/11111
 
 ###
 

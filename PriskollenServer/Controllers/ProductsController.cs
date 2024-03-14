@@ -44,6 +44,24 @@ public class ProductsController : ApiController
             errors => Problem(errors));
     }
 
+    [HttpGet("barcode/{barcode:int}")]
+    public async Task<IActionResult> GetProductByBarcode(int barcode)
+    {
+        ErrorOr<Product> getProductByBarcode = await _productService.GetProductByBarcode(barcode.ToString());
+        return getProductByBarcode.Match(
+            product => Ok(_map.MapToResponse(product)),
+            errors => Problem(errors));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllProducts()
+    {
+        ErrorOr<List<Product>> getAllProducts = await _productService.GetAllProducts();
+        return getAllProducts.Match(
+            products => Ok(_map.MapToResponse(products)),
+            errors => Problem(errors));
+    }
+
     private CreatedAtActionResult CreatedAtGetProduct(Product product)
         => CreatedAtAction(
             actionName: nameof(GetProduct),
