@@ -62,6 +62,21 @@ public class ProductsController : ApiController
             errors => Problem(errors));
     }
 
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateProduct(int id, ProductRequest request)
+    {
+        ErrorOr<ProductRequest> productRequestValidated = _validator.Validate(request);
+        if (productRequestValidated.IsError)
+        {
+            return Problem(productRequestValidated.Errors);
+        }
+
+        ErrorOr<Updated> result = await _productService.UpdateProduct(id, productRequestValidated.Value);
+        return result.Match(
+            updated => NoContent(),
+            errors => Problem(errors));
+    }
+
     private CreatedAtActionResult CreatedAtGetProduct(Product product)
         => CreatedAtAction(
             actionName: nameof(GetProduct),

@@ -100,5 +100,47 @@ public class ProductService : IProductService
         }
     }
 
-    public Task<ErrorOr<Updated>> UpdateProduct(int id, ProductRequest product) => throw new NotImplementedException();
+    public async Task<ErrorOr<Updated>> UpdateProduct(int id, ProductRequest product)
+    {
+        const string sqlQuery = @"UPDATE products
+	        SET barcode = @Barcode,
+                name = @Name, 
+		        brand = @Brand,
+                image = @Image,
+                volume = @Volume,
+                volume_with_liquid = @VolumeWithLiquid,
+                volume_unit = @VolumeUnit,
+		        modified = CURRENT_TIMESTAMP()
+	        WHERE id = @Id;SELECT ROW_COUNT();";
+        var parameters = new
+        {
+            id,
+            product.Barcode,
+            product.Name,
+            product.Brand,
+            product.Image,
+            product.Volume,
+            product.VolumeWithLiquid,
+            product.VolumeUnit,
+        };
+
+        try
+        {
+            using IDbConnection connection = _dbContext.CreateConnection();
+            int result = await connection.QuerySingleAsync<int>(sqlQuery, parameters);
+            if (result == 1)
+            {
+                _logger.LogInformation("Updated {Model} with Id: {Id} to values: {Store}", nameof(Product), id, product);
+                return Result.Updated;
+            }
+            // TODO: Make use of transaction to roll back
+            _logger.LogError("Updated a number of {Count} {Model} with Id: {Id} to values: {Store}", result, nameof(Product), id, product);
+            return Result.Updated;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update {Model} using parameters {Parameters}", nameof(Product), parameters);
+            return Errors.Product.NotFound;
+        }
+    }
 }

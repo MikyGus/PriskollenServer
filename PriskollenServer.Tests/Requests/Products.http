@@ -20,7 +20,7 @@ Content-Type: application/json
 GET {{fullAddress}}
 
 ######## GET PRODUCT BY ID ################
-GET {{fullAddress}}/2
+GET {{fullAddress}}/3
 
 ######## GET PRODUCT BY BARCODE ################
 GET {{fullAddress}}/barcode/11111
@@ -28,3 +28,17 @@ GET {{fullAddress}}/barcode/11111
 ###
 
 GET https://localhost:5001/Products/7
+
+######## UPDATE PRODUCT ################
+PUT {{fullAddress}}/3
+Content-Type: application/json
+
+{
+    "Barcode": "00999",
+    "Name": "Chips Mega Onion",
+    "Brand": "OLW",
+    "Image": "img2.jpg",
+    "Volume": 350,
+    "VolumeWithLiquid": null,
+    "VolumeUnit": "grammy"
+}
