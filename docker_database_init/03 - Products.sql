@@ -1,6 +1,6 @@
 CREATE TABLE products (
 	id int auto_increment,
-	barcode varchar(40),
+	barcode varchar(40) unique,
 	name varchar(40),
 	brand varchar(40),
 	image varchar(255),
